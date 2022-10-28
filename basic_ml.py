@@ -73,4 +73,4 @@ def use_tf(x_train, x_test, y_train, y_test, batch_size=64, epochs=100):
     x_test = np.asarray(x_test).astype('float32')
 
     model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
-    return model.evaluate(x_test, y_test, batch_size=batch_size)
+    return model.evaluate(x_test, y_test, batch_size=batch_size)[1]
