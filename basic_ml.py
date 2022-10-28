@@ -62,7 +62,8 @@ def use_tf(x_train, x_test, y_train, y_test, batch_size=64, epochs=100):
         keras.layers.Dense(6),
     ])
     # choose hyperparameters
-    loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    print(y_train[:5])
+    loss = keras.losses.SparseCategoricalCrossentropy(from_logits=False)
     optim = keras.optimizers.Adam(learning_rate=0.001)
     metrics = ["accuracy"]
     model.compile(loss=loss, optimizer=optim, metrics=metrics)
