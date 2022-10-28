@@ -18,10 +18,19 @@ import os
 import pickle
 import random
 import csv
-from dataset_manipulation import name_unique_features
-from dataset_manipulation import remove_notunique_features
-from dataset_manipulation import balance_dataset
-from dataset_manipulation import augmentate_dataset
+from types import NoneType
+import importlib.util
+# Check if 'dataset_manipulation' is installed
+if importlib.util.find_spec('dataset_manipulation') is NoneType:
+    from dataset_manipulation import name_unique_features
+    from dataset_manipulation import remove_notunique_features
+    from dataset_manipulation import balance_dataset
+    from dataset_manipulation import augmentate_dataset
+else:
+    from packages.dataset_manipulation import name_unique_features
+    from packages.dataset_manipulation import remove_notunique_features
+    from packages.dataset_manipulation import balance_dataset
+    from packages.dataset_manipulation import augmentate_dataset
 from sklearn.preprocessing import normalize
 from preprocessing_Dorians_features import normalize_features # noqa401
 from sklearn.model_selection import train_test_split
