@@ -53,17 +53,17 @@ def basic_ml(x_train, x_test, y_train, y_test, model, random_state=0):
     return accuracy_score(clf.predict(x_test), y_test)
 
 
-def use_tf(x_train, x_test, y_train, y_test, batch_size=64, epochs=100):
+def use_tf(x_train, x_test, y_train, y_test, batch_size=50, epochs=100):
     """Train a fully connected neural network and return its accuracy."""
     # design model
     model = keras.models.Sequential([
-        keras.layers.Dense(18, activation='relu',
+        keras.layers.Dense(80, activation='softmax',
                            input_shape=(x_train.shape[1],)),
-        keras.layers.Dense(6),
+        keras.layers.Dense(40, activation='softmax'),
+        keras.layers.Dense(6, activation='softmax'),
     ])
     # choose hyperparameters
-    print(y_train[:5])
-    loss = keras.losses.SparseCategoricalCrossentropy(from_logits=False)
+    loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     optim = keras.optimizers.Adam(learning_rate=0.001)
     metrics = ["accuracy"]
     model.compile(loss=loss, optimizer=optim, metrics=metrics)

@@ -1,7 +1,2 @@
 Name,Normal,Balance data,Augment data
-SVC,0.21,0.21,0.16
-DT,0.32,0.27,0.34
-KNN,0.29,0.39,0.51
-RF,0.41,0.53,0.58
-MPL,0.21,0.2,0.17
-my_mlp,0.2,0.24,0.25
+my_mlp,0.28,0.31,0.41

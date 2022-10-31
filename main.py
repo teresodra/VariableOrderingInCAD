@@ -18,10 +18,9 @@ import os
 import pickle
 import random
 import csv
-from types import NoneType
 import importlib.util
 # Check if 'dataset_manipulation' is installed
-if importlib.util.find_spec('dataset_manipulation') is NoneType:
+if isinstance(importlib.util.find_spec('dataset_manipulation'), type(None)):
     from dataset_manipulation import name_unique_features
     from dataset_manipulation import remove_notunique_features
     from dataset_manipulation import balance_dataset
@@ -42,7 +41,6 @@ names_features_targets_file = os.path.join(os.path.dirname(__file__),
                                            'names_features_targets.txt')
 with open(names_features_targets_file, 'rb') as f:
     names, features, targets = pickle.load(f)
-print(len(features), len(features[0]), len(targets))
 augmented_features, augmented_targets = augmentate_dataset(features, targets)
 
 normalized_augmented_features = normalize(augmented_features)
