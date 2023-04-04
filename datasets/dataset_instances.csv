@@ -1,7 +1,7 @@
 dataset,zero,one,two,three,four,five,total
 train normal dataset,326,74,105,41,163,106,815
-train balanced dataset,126,113,149,138,144,145,815
+train balanced dataset,151,121,136,152,133,122,815
 train augmented dataset,815,815,815,815,815,815,4890
 test normal dataset,80,19,30,10,39,26,204
-test balanced dataset,31,34,32,38,34,35,204
+test balanced dataset,29,27,32,48,34,34,204
 test augmented dataset,204,204,204,204,204,204,1224

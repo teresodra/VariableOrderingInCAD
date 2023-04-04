@@ -17,20 +17,13 @@ vol 12097. Springer, Cham. https://doi.org/10.1007/978-3-030-52200-1_30
 import os
 import pickle
 import csv
-import yaml
 import importlib.util
 from config.ml_models import ml_models
 from config.ml_models import classifiers
 from config.ml_models import dataset_types
 from config.hyperparameters_grid import grid
 from sklearn.model_selection import GridSearchCV
-
-
-def write_yaml_to_file(py_obj, filename):
-    with open(f'{filename}.yaml', 'w',) as f:
-        yaml.dump(py_obj, f, sort_keys=False)
-    print('Written to file successfully')
-
+from yaml_tools import read_yaml_from_file
 
 def k_folds_ml(x_train, y_train, model, random_state=0):
     """

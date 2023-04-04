@@ -1,15 +1,22 @@
-import yaml
-from yaml import UnsafeLoader
 import os
-from config.ml_models import ml_models
-from config.ml_models import dataset_types
+import pickle
+from yaml_tools import read_yaml_from_file
+from config.ml_models import classifiers
 
-print(ml_models)
-for ml_model in ml_models:
-    for method in dataset_types:
-        filename = os.path.join(os.path.dirname(__file__),
-                                'config', 'hyperparams',
-                                f'{method}_{ml_model}.yaml')
-        with open(filename, 'r') as f:
-            hyperparameters = yaml.load(f, Loader=UnsafeLoader)
-            print(type(hyperparameters), hyperparameters)
+
+def train_model(ml_model, method):
+    train_data_file = os.path.join(os.path.dirname(__file__),
+                                   'datasets', 'train',
+                                   f'{method}_train_dataset.txt')
+    hyperparams_file = os.path.join(os.path.dirname(__file__),
+                                    'config', 'hyperparams',
+                                    f'{method}_{ml_model}')
+    with open(train_data_file, 'rb') as f:
+        method_x_train, method_y_train = pickle.load(f)
+        hyperparams = read_yaml_from_file(hyperparams_file)
+        current_classifier = classifiers[ml_model]
+        clf = current_classifier(**hyperparams)
+        clf.fit(method_x_train, method_y_train)
+
+
+# print(train_model(ml_models[1], dataset_types[0]))

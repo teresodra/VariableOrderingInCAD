@@ -3,6 +3,7 @@ import numpy as np
 import math
 import random
 from .exploit_symmetries import give_all_symmetries
+from sklearn.preprocessing import normalize
 
 nvar = 3
 
@@ -73,10 +74,24 @@ def name_unique_features(names, features):
     return new_names
 
 
-def remove_notunique_features(unique_names, names, features):
+def get_unique_feature_names(unique_names, names, features):
     """Return the features corresponding to a name in 'unique_names'."""
     unique_features = []
     for index, feature in enumerate(zip(*features)):
         if names[index] in unique_names:
             unique_features.append(feature)
     return np.transpose(unique_features)
+
+
+def remove_notunique_features(names, features):
+    # creating some targets and timing because the function requires them
+    targets = [0]*len(features)
+    timings = [[0,0]]*len(features)
+    augmented_features, _, _ = augmentate_dataset(features, targets, timings)
+    # normalized_augmented_features = normalize(augmented_features)
+    unique_names = name_unique_features(names, augmented_features)
+    unique_features = []
+    for index, feature in enumerate(zip(*features)):
+        if names[index] in unique_names:
+            unique_features.append(feature)
+    return unique_names, np.transpose(unique_features)
