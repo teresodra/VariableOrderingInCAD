@@ -7,7 +7,7 @@ from .exploit_symmetries import give_all_symmetries
 nvar = 3
 
 
-def augmentate_dataset(features, targets):
+def augmentate_dataset(features, targets, timings):
     """
     Multiply the size of the dataset by 6.
 
@@ -17,13 +17,15 @@ def augmentate_dataset(features, targets):
     """
     symmetric_features = []
     symmetric_targets = []
-    for features, target in zip(features, targets):
+    symmetric_timings = []
+    for features, target, timing in zip(features, targets, timings):
         symmetric_features += give_all_symmetries(features, int(target))
         symmetric_targets += list(range(math.factorial(nvar)))
-    return np.array(symmetric_features), np.array(symmetric_targets)
+        symmetric_timings += list(timing)
+    return np.array(symmetric_features), np.array(symmetric_targets), np.array(symmetric_timings)
 
 
-def balance_dataset(features, targets):
+def balance_dataset(features, targets, timings):
     """
     Balance the dataset so all targets are almost equally common.
 
@@ -33,13 +35,15 @@ def balance_dataset(features, targets):
     """
     balanced_features = []
     balanced_targets = []
-    for features, target in zip(features, targets):
+    balanced_timings = []
+    for features, target, timing in zip(features, targets, timings):
         symmetric_features = give_all_symmetries(features, int(target))
         possible_targets = list(range(math.factorial(nvar)))
         new_target = random.choice(possible_targets)
         balanced_features.append(symmetric_features[new_target])
         balanced_targets.append(new_target)
-    return np.array(balanced_features), np.array(balanced_targets)
+        balanced_timings.append(timing[new_target])
+    return np.array(balanced_features), np.array(balanced_targets), np.array(balanced_timings)
 
 
 def name_unique_features(names, features):
@@ -57,7 +61,13 @@ def name_unique_features(names, features):
                  for ex_feature in new_features])
                 or np.std(feature) == 0):
             rep += 1
+        elif feature.count(feature[0])==len(feature):
+            print(names[index])
         else:
+            # if 'max_in_polys_max_sig'==names[index][:20]:
+            #     print("Check ", feature.count(feature[0])==len(feature))
+            #     print(names[index])
+            # print(len(feature))
             new_features.append(feature)
             new_names.append(names[index])
     return new_names
