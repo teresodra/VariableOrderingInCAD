@@ -17,13 +17,15 @@ vol 12097. Springer, Cham. https://doi.org/10.1007/978-3-030-52200-1_30
 import os
 import pickle
 import csv
-import importlib.util
 from config.ml_models import ml_models
 from config.ml_models import classifiers
 from config.ml_models import dataset_types
 from config.hyperparameters_grid import grid
 from sklearn.model_selection import GridSearchCV
-from yaml_tools import read_yaml_from_file
+from yaml_tools import write_yaml_to_file
+from find_filename import find_dataset_filename
+from find_filename import find_hyperparams_filename
+
 
 def k_folds_ml(x_train, y_train, model, random_state=0):
     """
@@ -38,6 +40,17 @@ def k_folds_ml(x_train, y_train, model, random_state=0):
                          cv=5)
     rf_cv.fit(x_train, y_train)
     return rf_cv.best_params_
+
+
+def choose_hyperparams(ml_model, method):
+    """Given a ml_model and a method, a file with the hyperparameters
+    chosen by cross validation is created"""
+    this_dataset_file = find_dataset_filename('train', method=method)
+    with open(this_dataset_file, 'rb') as f:
+        method_x_train, method_y_train = pickle.load(f)
+    hyperparams = k_folds_ml(method_x_train, method_y_train, model=ml_model)
+    hyperparams_filename = find_hyperparams_filename(method, ml_model)
+    write_yaml_to_file(hyperparams, hyperparams_filename)
 
 
 test_balanced_dataset_file = os.path.join(os.path.dirname(__file__),
