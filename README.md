@@ -8,7 +8,7 @@ This repository contains proof of data balancing and data augmentation's impact 
 
 - It also contains an installable package called dataset_manipulation that can balance and augment polynomial data. It is not necessary to install it.
 
-- Running the module main.py, a file called ml_results.csv (also included in the repository) will be generated showing a comparison between a variety of models trained either in data without manipulation, in balanced data or in augmented data.
+- Running the module main.py, files called ml_tested_in_normal.csv and ml_tested_in_normal.csv (also included in the repository) will be generated showing a comparison between a variety of models trained in data without manipulation, in balanced data and in augmented data.
     - For some models, there is not a big difference, but keep in mind that these models worked as well as random (accuracy close to 0.167) when using the hyperparameters found by Florescu in [1].
     - However, there is an amazing improvement in random forest and k-nearest-neighbours, where accuracies have an increment of up to 50% when data is augmented.
 
