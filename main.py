@@ -22,16 +22,20 @@ from train_models import train_model
 from test_models import test_results
 
 
-original_dataset_file = find_dataset_filename('unclean')
-clean_dataset_filename = find_dataset_filename('clean')
-cleaning_dataset(original_dataset_file, clean_dataset_filename)
-create_train_test_datasets()
+# original_dataset_file = find_dataset_filename('unclean')
+# clean_dataset_filename = find_dataset_filename('clean')
+# cleaning_dataset(original_dataset_file, clean_dataset_filename)
+# create_train_test_datasets()
 
+# for ml_model in ml_models:
+#     for method in dataset_types:
+#         print(f"Choosing hyperparameters for {ml_model} in {method}")
+#         choose_hyperparams(ml_model, method)
 for ml_model in ml_models:
+    print(f"Training {ml_model}")
     for method in dataset_types:
-        choose_hyperparams(ml_model, method)
-for ml_model in ml_models:
-    for method in dataset_types:
+        print(f"for {method}")
         train_model(ml_model, method)
-for testing_method in ['normal', 'balanced']:
+for testing_method in dataset_types:
+    print(f"Testing {testing_method}")
     test_results(testing_method)

@@ -3,29 +3,28 @@ import itertools
 from xml.sax.handler import all_features
 import numpy as np
 
-nvar=3
-
-
-
 
 def aveg(given_list):
     return sum(given_list)/len(given_list)
 
+
 def aveg_not_zero(given_list):
     return sum(given_list)/max(1,len([1 for elem in given_list if elem!=0]))
+
 
 def identity(input):
     return input
 
+
 def sign(input):
-    if type(input)==list:
+    if type(input) == list:
         return [sign(elem) for elem in input]
     else:
-        if input>0:
+        if input > 0:
             return 1
-        elif input<0:
+        elif input < 0:
             return -1
-        elif input==0:
+        elif input == 0:
             return 0
         else:
             raise Exception("How is this possible?")
@@ -51,21 +50,29 @@ def extract_features(dataset):
     all_original_polynomials = []
     for index, all_projections in enumerate(dataset[0]):
         original_polynomials = all_projections[0][0]
+        # the original polynomials are the initial polynomials of any
+        # of the possible projections (also of the first one)
         all_original_polynomials.append(original_polynomials)
-        names = []
-        instance_features = []
         all_targets.append(dataset[1][index])
         all_timings.append(dataset[2][index])
-        for var in range(nvar):
-            degrees = [[monomial[var] for monomial in poly]
-                       for poly in original_polynomials]
-            var_features, var_features_names = create_features(degrees,
-                                                               variable=var)
-            instance_features += var_features
-            names += var_features_names
-            sdegrees = [[sum(monomial) for monomial in poly if monomial[var]!=0]+[0] for poly in original_polynomials]
-            svar_features, svar_features_names = create_features(sdegrees, variable=var, sv=True)
-            instance_features += svar_features
-            names += svar_features_names
+        names, instance_features = features_from_set_of_polys(original_polynomials)
         all_features.append(instance_features)
     return np.array(all_original_polynomials), np.array(names), np.array(all_features), np.array(all_targets), np.array(all_timings)
+
+
+def features_from_set_of_polys(original_polynomials):
+    instance_features = []
+    names = []
+    nvar = len(original_polynomials[0][0]) - 1
+    for var in range(nvar):
+        degrees = [[monomial[var] for monomial in poly]
+                   for poly in original_polynomials]
+        var_features, var_features_names = create_features(degrees,
+                                                           variable=var)
+        instance_features += var_features
+        names += var_features_names
+        sdegrees = [[sum(monomial) for monomial in poly if monomial[var]!=0]+[0] for poly in original_polynomials]
+        svar_features, svar_features_names = create_features(sdegrees, variable=var, sv=True)
+        instance_features += svar_features
+        names += svar_features_names
+    return names, instance_features
