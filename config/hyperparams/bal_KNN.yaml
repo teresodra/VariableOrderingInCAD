@@ -1,0 +1,3 @@
+algorithm: auto
+n_neighbors: 1
+weights: uniform

@@ -29,12 +29,12 @@ def create_dataframe(dataset):
         np.array(all_features), np.array(all_targets), np.array(all_timings)
 
 
-dataset_filename = os.path.join(os.path.dirname(__file__),
-                                'DatasetsBeforeProcessing',
-                                'dataset_without_repetition_return_ncells.txt')
-with open(dataset_filename, 'rb') as f:
-    dataset = pickle.load(f)
-original_polys_list, names, features_list, targets_list, timings_list = create_dataframe(dataset)
+# dataset_filename = os.path.join(os.path.dirname(__file__),
+#                                 'DatasetsBeforeProcessing',
+#                                 'dataset_without_repetition_return_ncells.txt')
+# with open(dataset_filename, 'rb') as f:
+#     dataset = pickle.load(f)
+# original_polys_list, names, features_list, targets_list, timings_list = create_dataframe(dataset)
 
 
 def cleaning_dataset(dataset_filename, clean_dataset_filename):

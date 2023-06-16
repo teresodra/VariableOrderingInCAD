@@ -1,0 +1,3 @@
+algorithm: kd_tree
+n_neighbors: 12
+weights: distance

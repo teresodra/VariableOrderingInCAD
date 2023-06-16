@@ -1,0 +1,5 @@
+criterion: entropy
+max_depth: 8
+max_features: sqrt
+n_estimators: 200
+random_state: 18

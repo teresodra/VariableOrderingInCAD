@@ -1,0 +1,4 @@
+C: 100
+gamma: auto
+kernel: rbf
+tol: 0.0316
