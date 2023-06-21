@@ -24,6 +24,9 @@ def create_train_test_datasets():
     with open(clean_dataset_filename, 'rb') as clean_dataset_file:
         _, names, features, targets, timings = pickle.load(clean_dataset_file)
     unique_names, unique_features = remove_notunique_features(names, features)
+    # features were already unique because of create_clean_dataset
+    # decide where to remove the features
+    print("create_train_test", timings)
     unique_features_filename = find_other_filename("unique_features")
     with open(unique_features_filename, 'wb') as unique_features_file:
         pickle.dump(unique_features_filename, unique_features_file)
@@ -35,6 +38,7 @@ def create_train_test_datasets():
     x['train_normal'], x['test_normal'], y['train_normal'], y['test_normal'], t['train_normal'], t['test_normal'] = train_test_split(unique_features, targets, timings,
                                                                                                                                     test_size=0.20,
                                                                                                                                     random_state=random_state)
+                                                                                                                                    
     for purpose in ['train', 'test']:
         x[f'{purpose}_balanced'], y[f'{purpose}_balanced'], t[f'{purpose}_balanced'] = balance_dataset(x[f'{purpose}_normal'], y[f'{purpose}_normal'], t[f'{purpose}_normal'])
         x[f'{purpose}_augmented'], y[f'{purpose}_augmented'], t[f'{purpose}_augmented'] = augmentate_dataset(x[f'{purpose}_normal'], y[f'{purpose}_normal'], t[f'{purpose}_normal'])

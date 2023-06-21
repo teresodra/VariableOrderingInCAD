@@ -3,6 +3,7 @@ import numpy as np
 import math
 import random
 from .exploit_symmetries import give_all_symmetries
+from .exploit_symmetries import augmentate_timings
 # from sklearn.preprocessing import normalize
 
 nvar = 3
@@ -22,7 +23,8 @@ def augmentate_dataset(features, targets, timings):
     for features, target, timing in zip(features, targets, timings):
         symmetric_features += give_all_symmetries(features, int(target))
         symmetric_targets += list(range(math.factorial(nvar)))
-        symmetric_timings += list(timing)
+        symmetric_timings += augmentate_timings(timing, int(target))
+
     return np.array(symmetric_features), np.array(symmetric_targets), \
         np.array(symmetric_timings)
 
@@ -40,11 +42,11 @@ def balance_dataset(features, targets, timings):
     balanced_timings = []
     for features, target, timing in zip(features, targets, timings):
         symmetric_features = give_all_symmetries(features, int(target))
-        possible_targets = list(range(math.factorial(nvar)))
-        new_target = random.choice(possible_targets)
+        symmetric_timings = augmentate_timings(timing, int(target))
+        new_target = random.choice(list(range(math.factorial(nvar))))
         balanced_features.append(symmetric_features[new_target])
         balanced_targets.append(new_target)
-        balanced_timings.append(timing[new_target])
+        balanced_timings.append(symmetric_timings[new_target])
     return np.array(balanced_features), np.array(balanced_targets),\
         np.array(balanced_timings)
 
@@ -88,10 +90,10 @@ def get_unique_feature_names(unique_names, names, features):
     return np.transpose(unique_features)
 
 
-def remove_notunique_features(names, features):
+def remove_notunique_features(names, features, nvar=3):
     # creating some targets and timing because the function requires them
     targets = [0]*len(features)
-    timings = [[0, 0]]*len(features)
+    timings = [list(range(math.factorial(nvar)))]*len(features)
     augmented_features, _, _ = augmentate_dataset(features, targets, timings)
     # normalized_augmented_features = normalize(augmented_features)
     unique_names = name_unique_features(names, augmented_features)
