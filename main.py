@@ -15,12 +15,14 @@ vol 12097. Springer, Cham. https://doi.org/10.1007/978-3-030-52200-1_30
 from config.ml_models import ml_models
 from config.ml_models import dataset_types
 from find_filename import find_dataset_filename
+from find_filename import find_model_filename
 from create_clean_dataset import cleaning_dataset
 from test_train_datasets import create_train_test_datasets
 from choose_hyperparams import choose_hyperparams
 from train_models import train_model
 from test_models import test_results
 from test_models import timings_in_test
+from test_models import test_model
 
 
 # Hyperparameter tuning take a very long time,
@@ -47,12 +49,26 @@ from test_models import timings_in_test
 #     test_results(training_method)
 
 timings = dict()
-model = 'SVC'
-testing_method = 'Augmented'
-for training_method in dataset_types:
-    print(f"Testing models trained in {training_method}")
-    timings[training_method] = timings_in_test(model, testing_method, training_method)
+testing_method = 'augmented'
+test_dataset_filename = find_dataset_filename('test',
+                                              testing_method)
 
-from make_plots import survival_plot
-
-survival_plot(timings)
+with open("classification_output_timings.csv", 'w') as f:
+    f.write("model, Normal, Balanced, Augmented\n")
+for ml_model in ml_models:
+    for training_method in dataset_types:
+        trained_model_filename = find_model_filename(training_method,
+                                                     ml_model)
+        accuracy = test_model(trained_model_filename,
+                              test_dataset_filename)
+        timings[training_method] = timings_in_test(ml_model, testing_method,
+                                                   training_method)
+        total_time = sum(timings[training_method])
+        # with open("classification_output_acc_time.csv", 'a') as f:
+        #     f.write(f"{ml_model}, {accuracy}, {total_time}\n")
+    with open("classification_output_timings.csv", 'a') as f:
+        f.write(f"{ml_model}, {sum(timings['Normal'])}, {sum(timings['Balanced'])}, {sum(timings['Augmented'])}\n")
+    timings['optimal'] = timings_in_test('optimal', testing_method)
+    print(sum(timings['optimal']))
+    from make_plots import survival_plot
+    survival_plot(timings, plot_name=f"survival_plot_{ml_model}")

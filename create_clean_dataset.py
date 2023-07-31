@@ -51,7 +51,9 @@ def cleaning_dataset():
     unique_names, unique_features = remove_notunique_features(names, features)
 
     targets = np.array(targets_list)
-    timings = np.array(timings_list)
+    timings = np.array([[convert_to_timing(timings_ordering)
+                         for timings_ordering in timings_problem]
+                        for timings_problem in timings_list])
     original_polys = np.array(original_polys_list)
     with open(clean_dataset_filename, 'wb') as clean_dataset_file:
         dataset = pickle.dump((original_polys, unique_names,
@@ -65,3 +67,11 @@ def cleaning_dataset():
 #                                       'datasets',
 #                                       'clean_dataset.txt')
 # cleaning_dataset(dataset_filename, clean_dataset_filename)
+
+
+def convert_to_timing(timing_str):
+    if timing_str == "Over 30":
+        return 60
+    if timing_str == "Over 60":
+        return 120
+    return float(timing_str)

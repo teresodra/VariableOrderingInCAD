@@ -13,6 +13,7 @@ else:
 from sklearn.model_selection import train_test_split
 from find_filename import find_dataset_filename
 from find_filename import find_other_filename
+from math import log
 
 
 def count_instances(my_dataset, instance):
@@ -58,4 +59,15 @@ def create_train_test_datasets():
                                 + [str(len(y[f'{usage}_{method}']))])
 
 
-# create_train_test_datasets()
+def create_regression_datasets():
+    for usage in ['train', 'test']:
+        this_dataset_filename = find_dataset_filename(usage,
+                                                      method='augmented')
+        # we will use the augmented dataset here
+        with open(this_dataset_filename, 'rb') as this_dataset_file:
+            X, Y, T = pickle.load(this_dataset_file)
+            Y = [log(timings[0]) for timings in T] # remove log here if real times want to be given
+            this_dataset_filename =\
+                find_dataset_filename(usage, method='regression')
+            with open(this_dataset_filename, 'wb') as this_dataset_file:
+                pickle.dump((X, Y, T), this_dataset_file)

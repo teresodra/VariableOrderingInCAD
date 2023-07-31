@@ -2,7 +2,7 @@ import os
 import pickle
 import csv
 from config.ml_models import ml_models
-from config.ml_models import classifiers
+from config.ml_models import sklearn_models
 from config.ml_models import dataset_types
 from config.hyperparameters_grid import grid
 from sklearn.model_selection import GridSearchCV
@@ -17,11 +17,13 @@ def k_folds_ml(x_train, y_train, model, random_state=0):
 
     The hyperparameters of the models are chosen using 5-fold cross validation.
     """
-    current_classifier = classifiers[model]
+    current_classifier = sklearn_models[model]
     current_grid = grid[model]
     rf_cv = GridSearchCV(estimator=current_classifier(),
                          param_grid=current_grid,
-                         cv=5)
+                         cv=5,
+                         verbose=10 # to get updates
+                         ) 
     rf_cv.fit(x_train, y_train)
     return rf_cv.best_params_
 
@@ -34,6 +36,7 @@ def choose_hyperparams(ml_model, method):
         x_train, y_train, _ = pickle.load(f)
     hyperparams = k_folds_ml(x_train, y_train, model=ml_model)
     hyperparams_filename = find_hyperparams_filename(method, ml_model)
+    print(hyperparams_filename)
     write_yaml_to_file(hyperparams, hyperparams_filename)
 
 
@@ -75,7 +78,7 @@ def choose_hyperparams(ml_model, method):
 #                                    os.path.join(os.path.dirname(__file__),
 #                                                 'config', 'hyperparams',
 #                                                 f'{method}_{ml_model}'))
-#                 current_classifier = classifiers[ml_model]
+#                 current_classifier = sklearn_models[ml_model]
 #                 clf = current_classifier(**hyperparams)
 #                 clf.fit(x_train, y_train)
 #                 acc_balanced[method] = clf.score(balanced_x_test,
