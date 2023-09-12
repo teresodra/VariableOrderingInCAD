@@ -14,7 +14,12 @@ def train_model(ml_model, method):
     train_data_filename = find_dataset_filename('train', method=method)
     hyperparams_file = find_hyperparams_filename(method, ml_model)
     with open(train_data_filename, 'rb') as train_data_file:
-        x_train, y_train, _ = pickle.load(train_data_file)
+        if method == "Normal":
+            x_train, y_train, _, _ = pickle.load(train_data_file)
+        else:
+            x_train, y_train, _ = pickle.load(train_data_file)
+            # a = pickle.load(train_data_file)
+            # print(a[0], type(a), len(a), method)
     hyperparams = read_yaml_from_file(hyperparams_file)
     current_classifier = sklearn_models[ml_model]
     clf = current_classifier(**hyperparams)

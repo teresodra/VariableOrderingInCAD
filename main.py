@@ -12,6 +12,7 @@ Bigatti, A., Carette, J., Davenport, J., Joswig, M., de Wolff, T. (eds)
 Mathematical Software, ICMS 2020. ICMS 2020. Lecture Notes in Computer Science,
 vol 12097. Springer, Cham. https://doi.org/10.1007/978-3-030-52200-1_30
 """
+import csv
 from config.ml_models import ml_models
 from config.ml_models import dataset_types
 from find_filename import find_dataset_filename
@@ -29,7 +30,7 @@ from test_models import test_model
 # if tune_hyperparameters is used to decide whether to tune them
 # or to used previously tuned
 # tune_hyperparameters = False
-
+paradigm = 'classification'
 
 # cleaning_dataset()
 # create_train_test_datasets()
@@ -44,31 +45,44 @@ from test_models import test_model
 #     for method in dataset_types:
 #         print(f"for {method}")
 #         train_model(ml_model, method)
-# for training_method in dataset_types:
-#     print(f"Testing models trained in {training_method}")
-#     test_results(training_method)
-
-timings = dict()
+training_method = 'augmented'
 testing_method = 'augmented'
-test_dataset_filename = find_dataset_filename('test',
-                                              testing_method)
-
-with open("classification_output_timings.csv", 'w') as f:
-    f.write("model, Normal, Balanced, Augmented\n")
+first_time = 1
+output_file = "classification_output_acc_time.csv"
 for ml_model in ml_models:
-    for training_method in dataset_types:
-        trained_model_filename = find_model_filename(training_method,
-                                                     ml_model)
-        accuracy = test_model(trained_model_filename,
-                              test_dataset_filename)
-        timings[training_method] = timings_in_test(ml_model, testing_method,
-                                                   training_method)
-        total_time = sum(timings[training_method])
-        # with open("classification_output_acc_time.csv", 'a') as f:
-        #     f.write(f"{ml_model}, {accuracy}, {total_time}\n")
-    with open("classification_output_timings.csv", 'a') as f:
-        f.write(f"{ml_model}, {sum(timings['Normal'])}, {sum(timings['Balanced'])}, {sum(timings['Augmented'])}\n")
-    timings['optimal'] = timings_in_test('optimal', testing_method)
-    print(sum(timings['optimal']))
-    from make_plots import survival_plot
-    survival_plot(timings, plot_name=f"survival_plot_{ml_model}")
+    print(f"Testing models trained in {training_method}")
+    metrics = test_model(ml_model, paradigm=training_method, testing_method=testing_method)
+    if first_time == 1:
+        first_time = 0
+        keys = list(metrics.keys())
+        with open(output_file, 'a') as f:
+            f.write(', '.join(['Model'] + keys) + '\n')
+    with open(output_file, 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([ml_model] + [metrics[key] for key in keys])
+
+
+# timings = dict()
+# testing_method = 'augmented'
+# test_dataset_filename = find_dataset_filename('test',
+#                                               testing_method)
+
+# with open("classification_output_timings.csv", 'w') as f:
+#     f.write("model, Normal, Balanced, Augmented\n")
+# for ml_model in ml_models:
+#     for training_method in dataset_types:
+#         trained_model_filename = find_model_filename(training_method,
+#                                                      ml_model)
+#         accuracy = test_model(trained_model_filename,
+#                               test_dataset_filename)
+#         timings[training_method] = timings_in_test(ml_model, testing_method,
+#                                                    training_method)
+#         total_time = sum(timings[training_method])
+#         # with open("classification_output_acc_time.csv", 'a') as f:
+#         #     f.write(f"{ml_model}, {accuracy}, {total_time}\n")
+#     with open("classification_output_timings.csv", 'a') as f:
+#         f.write(f"{ml_model}, {sum(timings['Normal'])}, {sum(timings['Balanced'])}, {sum(timings['Augmented'])}\n")
+#     timings['optimal'] = timings_in_test('optimal', testing_method)
+#     print(sum(timings['optimal']))
+#     from make_plots import survival_plot
+#     survival_plot(timings, plot_name=f"survival_plot_{ml_model}")

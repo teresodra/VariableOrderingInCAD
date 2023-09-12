@@ -12,6 +12,7 @@ else:
     from packages.dataset_manipulation import remove_notunique_features
 from from_poly_set_to_features import poly_set_feature_extractor
 from find_filename import find_dataset_filename
+from find_filename import find_other_filename
 
 
 def create_dataframe(dataset):
@@ -44,21 +45,26 @@ def cleaning_dataset():
     clean_dataset_filename = find_dataset_filename('clean')
     with open(dataset_filename, 'rb') as f:
         dataset = pickle.load(f)
-    original_polys_list, names, features_list, targets_list, timings_list =\
-        extract_features(dataset)
-    # working with raw features
-    features = np.array(features_list)
-    unique_names, unique_features = remove_notunique_features(names, features)
-
-    targets = np.array(targets_list)
-    timings = np.array([[convert_to_timing(timings_ordering)
-                         for timings_ordering in timings_problem]
-                        for timings_problem in timings_list])
-    original_polys = np.array(original_polys_list)
+    my_dataset = extract_features(dataset)
+    clean_dataset = dict()
+    # # working with raw features
+    # features = np.array(features_list)
+    clean_dataset['names'], clean_dataset['features'] = \
+        remove_notunique_features(my_dataset['names'],
+                                  my_dataset['features'])
+    unique_features_filename = find_other_filename("unique_features")
+    with open(unique_features_filename, 'wb') as unique_features_file:
+        pickle.dump(clean_dataset['names'], unique_features_file)
+    # Some timings are expressed as "Over 30", this is changed here
+    clean_dataset['timings'] = \
+        np.array([[convert_to_timing(timings_ordering)
+                  for timings_ordering in timings_problem]
+                  for timings_problem in my_dataset['timings']])
+    for key in my_dataset:
+        if key not in clean_dataset:
+            clean_dataset[key] = my_dataset[key]
     with open(clean_dataset_filename, 'wb') as clean_dataset_file:
-        dataset = pickle.dump((original_polys, unique_names,
-                               unique_features, targets, timings),
-                              clean_dataset_file)
+        pickle.dump(clean_dataset, clean_dataset_file)
 
 # dataset_filename = os.path.join(os.path.dirname(__file__),
 #                                 'DatasetsBeforeProcessing',
