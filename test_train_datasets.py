@@ -34,6 +34,7 @@ def create_train_test_datasets():
     y = dict()  # to keep the labels
     t = dict()  # to keep the timings
     p = dict()  # to keep the projections
+    c = dict()  # to keep the number of cells
     # train and test sets are created
     random_state = 0
     x['train_normal'], x['test_normal'], \

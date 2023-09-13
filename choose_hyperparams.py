@@ -22,8 +22,8 @@ def k_folds_ml(x_train, y_train, model, random_state=0):
     rf_cv = GridSearchCV(estimator=current_classifier(),
                          param_grid=current_grid,
                          cv=5,
-                         verbose=10 # to get updates
-                         ) 
+                         verbose=10  # to get updates
+                         )
     rf_cv.fit(x_train, y_train)
     return rf_cv.best_params_
 

@@ -68,6 +68,7 @@ def extract_features(dataset):
     all_timings = []
     all_original_polynomials = []
     all_projections = []
+    all_cells = []
     for index, projections in enumerate(dataset[0]):
         all_projections.append(projections)
         original_polynomials = projections[0][0]
@@ -76,6 +77,7 @@ def extract_features(dataset):
         all_original_polynomials.append(original_polynomials)
         all_targets.append(dataset[1][index])
         all_timings.append(dataset[2][index])
+        all_cells.append(dataset[3][index])
         names, instance_features = features_from_set_of_polys(
                                        original_polynomials)
         all_features.append(instance_features)
@@ -85,6 +87,7 @@ def extract_features(dataset):
     my_dataset['targets'] = np.array(all_targets)
     my_dataset['timings'] = np.array(all_timings)
     my_dataset['projections'] = np.array(all_projections)
+    my_dataset['cells'] = np.array(all_cells)
     return my_dataset
 
 

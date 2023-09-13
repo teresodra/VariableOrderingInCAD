@@ -33,7 +33,7 @@ from test_models import test_model
 paradigm = 'classification'
 
 # cleaning_dataset()
-# create_train_test_datasets()
+create_train_test_datasets()
 
 # if tune_hyperparameters:
 #     for ml_model in ml_models:
