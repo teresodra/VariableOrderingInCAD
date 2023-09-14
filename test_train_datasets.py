@@ -59,22 +59,24 @@ def create_train_test_datasets():
     keys = ['features', 'labels', 'timings', 'cells']
     for purpose in purposes:
         datasets[f'{purpose}_Balanced'] = \
-            {key: elem for key, elem in zip(keys,
-                                            balance_dataset(*[datasets[f'{purpose}_Normal'][key2]
-                                                            for key2 in keys])
-                                            )
+            {key: elem for key,
+             elem in zip(keys, balance_dataset(
+                                   *[datasets[f'{purpose}_Normal'][key2]
+                                     for key2 in keys]))
              }
         datasets[f'{purpose}_Augmented'] = \
-            {key: elem for key, elem in zip(keys,
-                                            augmentate_dataset(*[datasets[f'{purpose}_Normal'][key2]
-                                                               for key2 in keys])
-                                            )
+            {key: elem for key,
+             elem in zip(keys, augmentate_dataset(
+                                   *[datasets[f'{purpose}_Normal'][key2]
+                                     for key2 in keys]))
              }
     for purpose in purposes:
         for quality in dataset_qualities:
-            this_dataset_filename = find_dataset_filename(purpose, method=quality)
+            this_dataset_filename = \
+                find_dataset_filename(purpose, method=quality)
             with open(this_dataset_filename, 'wb') as this_dataset_file:
-                pickle.dump(datasets[purpose + '_' + quality], this_dataset_file)
+                pickle.dump(datasets[purpose + '_' + quality],
+                            this_dataset_file)
 
 
     ## The following code is to count how many instances of each are there in the different datasets
@@ -108,10 +110,13 @@ def create_regression_datasets(taking_logarithms=True):
         # we will use the augmented dataset here
         with open(this_dataset_filename, 'rb') as this_dataset_file:
             regression_dataset = pickle.load(this_dataset_file)
+            regression_dataset['labels'] = \
+                [timings[0] for timings
+                 in regression_dataset['timings']]
             if taking_logarithms:
-                regression_dataset['labels'] = [log(timings[0]) for timings in regression_dataset['timings']]
-            else:
-                regression_dataset['labels'] = [timings[0] for timings in regression_dataset['timings']]
+                regression_dataset['labels'] = \
+                    [log(label) for label
+                     in regression_dataset['labels']]
             this_dataset_filename =\
                 find_dataset_filename(purpose, method='regression')
             with open(this_dataset_filename, 'wb') as this_dataset_file:

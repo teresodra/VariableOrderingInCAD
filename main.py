@@ -30,7 +30,7 @@ from test_models import test_model
 # Hyperparameter tuning take a very long time,
 # if tune_hyperparameters is used to decide whether to tune them
 # or to used previously tuned
-# tune_hyperparameters = False
+tune_hyperparameters = False
 paradigm = 'classification'
 
 cleaning_dataset()
@@ -52,12 +52,14 @@ first_time = 1
 output_file = "classification_output_acc_time.csv"
 for ml_model in ml_models:
     print(f"Testing models trained in {training_method}")
-    metrics = test_model(ml_model, paradigm=training_method, testing_method=testing_method)
+    metrics = test_model(ml_model,
+                         paradigm=training_method,
+                         testing_method=testing_method)
     if first_time == 1:
         first_time = 0
         keys = list(metrics.keys())
         with open(output_file, 'a') as f:
-            f.write('No more cheating\n')
+            f.write('Now really NO more cheating\n')
             f.write(', '.join(['Model'] + keys) + '\n')
     with open(output_file, 'a', newline='') as f:
         writer = csv.writer(f)
@@ -66,7 +68,7 @@ for ml_model in ml_models:
 
 # timings = dict()
 # testing_method = 'augmented'
-# test_dataset_filename = find_dataset_filename('test',
+# test_dataset_filename = find_dataset_filename('Test',
 #                                               testing_method)
 
 # with open("classification_output_timings.csv", 'w') as f:
@@ -83,7 +85,8 @@ for ml_model in ml_models:
 #         # with open("classification_output_acc_time.csv", 'a') as f:
 #         #     f.write(f"{ml_model}, {accuracy}, {total_time}\n")
 #     with open("classification_output_timings.csv", 'a') as f:
-#         f.write(f"{ml_model}, {sum(timings['Normal'])}, {sum(timings['Balanced'])}, {sum(timings['Augmented'])}\n")
+#         f.write(f"{ml_model}, {sum(timings['Normal'])}, \
+#                  {sum(timings['Balanced'])}, {sum(timings['Augmented'])}\n")
 #     timings['optimal'] = timings_in_test('optimal', testing_method)
 #     print(sum(timings['optimal']))
 #     from make_plots import survival_plot
