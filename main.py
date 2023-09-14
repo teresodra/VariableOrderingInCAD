@@ -1,7 +1,7 @@
 """
 The experiments in [1] are replicated with some changes.
 
-The first change is that the testing data is balanced, so that all targets
+The first change is that the testing data is balanced, so that all labels
 are almost equally common.
 Then we use three training sets; dataset as in [1], balanced dataset
 and data augmentation dataset.
@@ -14,7 +14,8 @@ vol 12097. Springer, Cham. https://doi.org/10.1007/978-3-030-52200-1_30
 """
 import csv
 from config.ml_models import ml_models
-from config.ml_models import dataset_types
+from config.general_values import dataset_qualities
+from config.general_values import purposes
 from find_filename import find_dataset_filename
 from find_filename import find_model_filename
 from create_clean_dataset import cleaning_dataset
@@ -32,19 +33,19 @@ from test_models import test_model
 # tune_hyperparameters = False
 paradigm = 'classification'
 
-# cleaning_dataset()
+cleaning_dataset()
 create_train_test_datasets()
 
 # if tune_hyperparameters:
 #     for ml_model in ml_models:
-#         for method in dataset_types:
+#         for method in dataset_qualities:
 #             print(f"Choosing hyperparameters for {ml_model} in {method}")
 #             choose_hyperparams(ml_model, method)
-# for ml_model in ml_models:
-#     print(f"Training {ml_model}")
-#     for method in dataset_types:
-#         print(f"for {method}")
-#         train_model(ml_model, method)
+for ml_model in ml_models:
+    print(f"Training {ml_model}")
+    for method in dataset_qualities:
+        print(f"for {method}")
+        train_model(ml_model, method)
 training_method = 'augmented'
 testing_method = 'augmented'
 first_time = 1
@@ -56,6 +57,7 @@ for ml_model in ml_models:
         first_time = 0
         keys = list(metrics.keys())
         with open(output_file, 'a') as f:
+            f.write('No more cheating\n')
             f.write(', '.join(['Model'] + keys) + '\n')
     with open(output_file, 'a', newline='') as f:
         writer = csv.writer(f)
@@ -70,7 +72,7 @@ for ml_model in ml_models:
 # with open("classification_output_timings.csv", 'w') as f:
 #     f.write("model, Normal, Balanced, Augmented\n")
 # for ml_model in ml_models:
-#     for training_method in dataset_types:
+#     for training_method in dataset_qualities:
 #         trained_model_filename = find_model_filename(training_method,
 #                                                      ml_model)
 #         accuracy = test_model(trained_model_filename,

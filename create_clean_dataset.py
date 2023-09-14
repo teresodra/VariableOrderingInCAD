@@ -17,7 +17,7 @@ from find_filename import find_other_filename
 
 def create_dataframe(dataset):
     all_features = []
-    all_targets = dataset[1][:]
+    all_labels = dataset[1][:]
     all_timings = dataset[2][:]
     all_original_polynomials = []
     for index, all_projections in enumerate(dataset[0]):
@@ -28,7 +28,7 @@ def create_dataframe(dataset):
                                    determine_standarization=True,
                                    determine_unique_features=True)
     return np.array(all_original_polynomials), np.array(names),\
-        np.array(all_features), np.array(all_targets), np.array(all_timings)
+        np.array(all_features), np.array(all_labels), np.array(all_timings)
 
 
 # dataset_filename = os.path.join(os.path.dirname(__file__),
@@ -36,7 +36,7 @@ def create_dataframe(dataset):
 #                                 'dataset_without_repetition_return_ncells.txt')
 # with open(dataset_filename, 'rb') as f:
 #     dataset = pickle.load(f)
-# original_polys_list, names, features_list, targets_list, timings_list =\
+# original_polys_list, names, features_list, labels_list, timings_list =\
 #     create_dataframe(dataset)
 
 
@@ -63,6 +63,7 @@ def cleaning_dataset():
     for key in my_dataset:
         if key not in clean_dataset:
             clean_dataset[key] = my_dataset[key]
+    print("CLEAN", clean_dataset.keys())
     with open(clean_dataset_filename, 'wb') as clean_dataset_file:
         pickle.dump(clean_dataset, clean_dataset_file)
 

@@ -3,7 +3,7 @@ import pickle
 import csv
 from config.ml_models import ml_models
 from config.ml_models import sklearn_models
-from config.ml_models import dataset_types
+from config.general_values import dataset_qualities
 from config.hyperparameters_grid import grid
 from sklearn.model_selection import GridSearchCV
 from yaml_tools import write_yaml_to_file
@@ -56,17 +56,17 @@ def choose_hyperparams(ml_model, method):
 #                                     'ml_results_k_fold_tested_in_balanced.csv')
 # with open(output_file_balanced, 'w') as f_balanced:
 #     writer_balanced = csv.writer(f_balanced)
-#     writer_balanced.writerow(["Name"] + dataset_types)
+#     writer_balanced.writerow(["Name"] + dataset_qualities)
 #     output_file_normal = os.path.join(os.path.dirname(__file__),
 #                                       'ml_results_k_fold_tested_in_normal.csv')
 #     with open(output_file_normal, 'w') as f_normal:
 #         writer_normal = csv.writer(f_normal)
-#         writer_normal.writerow(["Name"] + dataset_types)
+#         writer_normal.writerow(["Name"] + dataset_qualities)
 #         for ml_model in ml_models:
 #             print(f"Model: {ml_model}")
 #             acc_balanced = dict()
 #             acc_normal = dict()
-#             for method in dataset_types:
+#             for method in dataset_qualities:
 #                 this_dataset_file = os.path.join(os.path.dirname(__file__),
 #                                                  'datasets', 'train',
 #                                                  f'{method}_train_dataset.txt')
@@ -91,10 +91,10 @@ def choose_hyperparams(ml_model, method):
 #                     pickle.dump(clf, method_file)
 #             round_accuracies_balanced = [round(acc, 2)
 #                                          for acc in [acc_balanced[method_here]
-#                                          for method_here in dataset_types]]
+#                                          for method_here in dataset_qualities]]
 #             round_accuracies_normal = [round(acc, 2)
 #                                        for acc in [acc_normal[method_here]
-#                                        for method_here in dataset_types]]
+#                                        for method_here in dataset_qualities]]
 #             writer_balanced.writerow([ml_model] + round_accuracies_balanced)
 #             writer_normal.writerow([ml_model] + round_accuracies_normal)
 

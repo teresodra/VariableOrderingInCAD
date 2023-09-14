@@ -64,7 +64,7 @@ def create_features(degrees, variable=0, sv=False,
 def extract_features(dataset):
     my_dataset = dict()
     all_features = []
-    all_targets = []
+    all_labels = []
     all_timings = []
     all_original_polynomials = []
     all_projections = []
@@ -75,7 +75,7 @@ def extract_features(dataset):
         # the original polynomials are the initial polynomials of any
         # of the possible projections (also of the first one)
         all_original_polynomials.append(original_polynomials)
-        all_targets.append(dataset[1][index])
+        all_labels.append(dataset[1][index])
         all_timings.append(dataset[2][index])
         all_cells.append(dataset[3][index])
         names, instance_features = features_from_set_of_polys(
@@ -84,7 +84,7 @@ def extract_features(dataset):
     my_dataset['polynomials'] = np.array(all_original_polynomials)
     my_dataset['names'] = np.array(names)
     my_dataset['features'] = np.array(all_features)
-    my_dataset['targets'] = np.array(all_targets)
+    my_dataset['labels'] = np.array(all_labels)
     my_dataset['timings'] = np.array(all_timings)
     my_dataset['projections'] = np.array(all_projections)
     my_dataset['cells'] = np.array(all_cells)
