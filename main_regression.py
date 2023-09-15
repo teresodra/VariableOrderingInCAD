@@ -26,43 +26,44 @@ from test_models import test_model
 # Hyperparameter tuning take a very long time,
 # if tune_hyperparameters is used to decide whether to tune them
 # or to used previously tuned
-tune_hyperparameters = False
+tune_hyperparameters = True
 taking_logarithms = False
 
+for i in range(1):
+    # cleaning_dataset()
+    # create_train_test_datasets()
+    # create_regression_datasets(taking_logarithms=taking_logarithms)
 
-# cleaning_dataset()
-# create_train_test_datasets()
-create_regression_datasets(taking_logarithms=taking_logarithms)
+    paradigm = "regression"
+    if tune_hyperparameters:
+        for ml_model in ml_regressors:
+            print(f"Choosing hyperparameters for {ml_model} in {paradigm}")
+            choose_hyperparams(ml_model, paradigm)
 
-paradigm = "regression"
-# if tune_hyperparameters:
-#     for ml_model in ml_regressors:
-#         print(f"Choosing hyperparameters for {ml_model} in {paradigm}")
-#         choose_hyperparams(ml_model, paradigm)
-for ml_model in ml_regressors:
-    print(f"Training {ml_model}")
-    print(f"for {paradigm}")
-    train_model(ml_model, paradigm)
-testing_method = 'augmented'
-output_file = "regression_output_acc_time.csv"
-# with open(output_file, 'a') as f:
-#     f.write("Now without logarithms and without aveg_not_zero\n")
+    for ml_model in ml_regressors:
+        print(f"Training {ml_model}")
+        print(f"for {paradigm}")
+        train_model(ml_model, paradigm)
+    testing_method = 'augmented'
+    output_file = "regression_output_acc_time.csv"
+    # with open(output_file, 'a') as f:
+    #     f.write("Now without logarithms and without aveg_not_zero\n")
 
-first_time = 1
-for ml_model in ml_regressors:
-    ###
-    # For KNNR running properly X.shape[0] has been changed to len(X)
-    # in line 240 of
-    # C:\Software\Python37\Lib\site-packages\sklearn\neighbors\_regression.py
-    print(f"Testing models trained in {ml_model}")
-    metrics = test_model(ml_model, paradigm=paradigm,
-                         testing_method=testing_method)
-    if first_time == 1:
-        first_time = 0
-        keys = list(metrics.keys())
-        with open(output_file, 'a') as f:
-            f.write('No more cheating; no taking logarithms also\n')
-            f.write(', '.join(['Model'] + keys) + '\n')
-    with open(output_file, 'a', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow([ml_model] + [metrics[key] for key in keys])
+    first_time = 1
+    for ml_model in ml_regressors:
+        ###
+        # For KNNR running properly X.shape[0] has been changed to len(X)
+        # in line 240 of
+        # C:\Software\Python37\Lib\site-packages\sklearn\neighbors\_regression.py
+        print(f"Testing models trained in {ml_model}")
+        metrics = test_model(ml_model, paradigm=paradigm,
+                            testing_method=testing_method)
+        if first_time == 1:
+            first_time = 0
+            keys = list(metrics.keys())
+            with open(output_file, 'a') as f:
+                f.write('No more cheating; no taking logarithms also\n')
+                f.write(', '.join(['Model'] + keys) + '\n')
+        with open(output_file, 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([ml_model] + [metrics[key] for key in keys])

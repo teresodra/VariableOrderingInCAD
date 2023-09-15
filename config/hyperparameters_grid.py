@@ -2,10 +2,16 @@
 
 grid = dict()
 grid['RF'] = {
-    'n_estimators': [200, 300, 400, 500],
-    'max_features': ['sqrt', 'log2'],
-    'max_depth': [4, 5, 6, 7, 8],
-    'criterion': ['gini', 'entropy']
+    # 'n_estimators': [200, 300, 400, 500],
+    # 'max_features': ['sqrt', 'log2'],
+    # 'max_depth': [4, 5, 6, 7, 8],
+    # 'criterion': ['gini', 'entropy']
+    'n_estimators': [50, 100, 200],
+    'criterion': ['gini', 'entropy'],
+    'max_depth': [None, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'class_weight': [None, 'balanced'],
 }
 grid['KNN'] = {
     'n_neighbors': [1,3,5,7,12],
@@ -35,9 +41,18 @@ grid['SVC'] = {
 }
 
 grid['RFR'] = {
-    'criterion': ['squared_error', 'friedman_mse'],
-    "max_depth": [1,3,7],
-    "min_samples_leaf": [1,5,10],
+    # 'n_estimators': [200, 300, 400, 500],
+    # 'max_features': ['sqrt', 'log2'],
+    # 'max_depth': [4, 5, 6, 7, 8],
+    # 'criterion': ['squared_error', 'entropy']
+    # # 'criterion': ['squared_error', 'friedman_mse'],
+    # # "max_depth": [1,3,7],
+    # # "min_samples_leaf": [1,5,10],
+    'n_estimators': [50, 100, 200],
+    'criterion': ['mse', 'mae'],
+    'max_depth': [None, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
 }
 grid['KNNR'] = {
     'n_neighbors': [3, 5, 10],

@@ -13,19 +13,19 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.neighbors import KNeighborsRegressor
 
 ml_models = [
-             'KNN',
-             'DT',
-             'SVC',
+            #  'KNN',
+            #  'DT',
+            #  'SVC',
              'RF',
-             'MLP'
+            #  'MLP'
              ]
 
 ml_regressors = [
-                 'DTR',
-                 'SVR',
+                #  'DTR',
+                #  'SVR',
                  'RFR',
-                 'KNNR',
-                 'MLPR'
+                #  'KNNR',
+                #  'MLPR'
                  ]
 
 sklearn_models = {

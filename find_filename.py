@@ -20,9 +20,9 @@ def find_dataset_filename(purpose, method=None):
         return os.path.join(os.path.dirname(__file__),
                             'DatasetsBeforeProcessing',
                             'dataset_without_repetition_return_ncells.txt')
-                            # 'dataset_with_repetition_return_ncells.txt')
-                            # for returning "repeated" instances
-                            # those with the same number of cells for all projections
+    # 'dataset_with_repetition_return_ncells.txt')
+    # for returning "repeated" instances
+    # those with the same number of cells for all projections
     elif purpose == "clean":
         return os.path.join(os.path.dirname(__file__),
                             'datasets',

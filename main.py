@@ -30,17 +30,17 @@ from test_models import test_model
 # Hyperparameter tuning take a very long time,
 # if tune_hyperparameters is used to decide whether to tune them
 # or to used previously tuned
-tune_hyperparameters = False
+tune_hyperparameters = True
 paradigm = 'classification'
 
-cleaning_dataset()
-create_train_test_datasets()
+# cleaning_dataset()
+# create_train_test_datasets()
 
-# if tune_hyperparameters:
-#     for ml_model in ml_models:
-#         for method in dataset_qualities:
-#             print(f"Choosing hyperparameters for {ml_model} in {method}")
-#             choose_hyperparams(ml_model, method)
+if tune_hyperparameters:
+    for ml_model in ml_models:
+        for method in dataset_qualities:
+            print(f"Choosing hyperparameters for {ml_model} in {method}")
+            choose_hyperparams(ml_model, method)
 for ml_model in ml_models:
     print(f"Training {ml_model}")
     for method in dataset_qualities:
@@ -59,7 +59,7 @@ for ml_model in ml_models:
         first_time = 0
         keys = list(metrics.keys())
         with open(output_file, 'a') as f:
-            f.write('Now really NO more cheating\n')
+            f.write('No hyperparameters\n')
             f.write(', '.join(['Model'] + keys) + '\n')
     with open(output_file, 'a', newline='') as f:
         writer = csv.writer(f)

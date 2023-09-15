@@ -36,16 +36,13 @@ def sign(input):
 
 
 def create_features(degrees, variable=0, sv=False,
-                    include_aveg_not_zero=False):
-    if include_aveg_not_zero:
-        functions = [sum, max, aveg, aveg_not_zero]
-    else:
-        functions = [sum, max, aveg]  # , aveg_not_zero]
+                    operations=[sum, max, aveg, aveg_not_zero]):
     sign_or_not = [identity, sign]
     features = []
     features_names = []
-    for choice in itertools.product(functions,
-                                    sign_or_not, functions,
+    for choice in itertools.product(operations,
+                                    sign_or_not,
+                                    operations,
                                     sign_or_not):
         feature_description = (choice[0].__name__
                                + "sign" * (choice[1].__name__ == "sign")
@@ -78,8 +75,10 @@ def extract_features(dataset):
         all_labels.append(dataset[1][index])
         all_timings.append(dataset[2][index])
         all_cells.append(dataset[3][index])
-        names, instance_features = features_from_set_of_polys(
-                                       original_polynomials)
+        names, instance_features = \
+            features_from_set_of_polys(
+                original_polynomials,
+                operations=[sum, max, aveg, aveg_not_zero])
         all_features.append(instance_features)
     my_dataset['polynomials'] = np.array(all_original_polynomials)
     my_dataset['names'] = np.array(names)
@@ -91,23 +90,37 @@ def extract_features(dataset):
     return my_dataset
 
 
-def features_from_set_of_polys(original_polynomials):
+def features_from_set_of_polys(original_polynomials,
+                               operations=[sum, max, aveg, aveg_not_zero]):
     instance_features = []
     names = []
     nvar = len(original_polynomials[0][0]) - 1
     for var in range(nvar):
-        degrees = [[monomial[var] for monomial in poly]
-                   for poly in original_polynomials]
-        var_features, var_features_names = create_features(degrees,
-                                                           variable=var)
+        var_features, var_names = \
+            compute_features_for_var(original_polynomials,
+                                     var,
+                                     operations=operations)
         instance_features += var_features
-        names += var_features_names
-        sdegrees = \
-            [[sum(monomial) for monomial in poly if monomial[var] != 0] + [0]
-             for poly in original_polynomials]
-        svar_features, svar_features_names = create_features(sdegrees,
-                                                             variable=var,
-                                                             sv=True)
-        instance_features += svar_features
-        names += svar_features_names
+        names += var_names
     return names, instance_features
+
+
+def compute_features_for_var(original_polynomials, var, operations):
+    '''Given polynomials and a variable computes the features'''
+    degrees = [[monomial[var] for monomial in poly]
+               for poly in original_polynomials]
+    var_features, var_features_names = \
+        create_features(degrees,
+                        variable=var,
+                        operations=operations)
+    sdegrees = \
+        [[sum(monomial) for monomial in poly if monomial[var] != 0] + [0]
+         for poly in original_polynomials]
+    svar_features, svar_features_names = \
+        create_features(sdegrees,
+                        variable=var,
+                        sv=True,
+                        operations=operations)
+    var_names = var_features_names + svar_features_names
+    var_features = var_features + svar_features
+    return var_features, var_names

@@ -1,5 +1,6 @@
-criterion: gini
-max_depth: 8
-max_features: sqrt
-n_estimators: 500
-random_state: 18
+class_weight: balanced
+criterion: entropy
+max_depth: 20
+min_samples_leaf: 2
+min_samples_split: 5
+n_estimators: 50
