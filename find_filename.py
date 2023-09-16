@@ -47,3 +47,10 @@ def find_output_filename(training_method):
 def find_other_filename(search):
     return os.path.join(os.path.dirname(__file__), 'config',
                         f'{search}.txt')
+
+
+import pickle
+names_filename = find_other_filename('unique_names')
+with open(names_filename, 'rb') as names_f:
+    names = pickle.load(names_f)
+print(len(names), '\n', names[2], '\n', names[67], '\n', names[132])

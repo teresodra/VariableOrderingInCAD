@@ -26,13 +26,13 @@ from test_models import test_model
 # Hyperparameter tuning take a very long time,
 # if tune_hyperparameters is used to decide whether to tune them
 # or to used previously tuned
-tune_hyperparameters = True
+tune_hyperparameters = False
 taking_logarithms = False
 
 for i in range(1):
     # cleaning_dataset()
     # create_train_test_datasets()
-    # create_regression_datasets(taking_logarithms=taking_logarithms)
+    create_regression_datasets(taking_logarithms=taking_logarithms)
 
     paradigm = "regression"
     if tune_hyperparameters:
@@ -62,7 +62,7 @@ for i in range(1):
             first_time = 0
             keys = list(metrics.keys())
             with open(output_file, 'a') as f:
-                f.write('No more cheating; no taking logarithms also\n')
+                f.write('After changing dataset\n')
                 f.write(', '.join(['Model'] + keys) + '\n')
         with open(output_file, 'a', newline='') as f:
             writer = csv.writer(f)

@@ -48,11 +48,6 @@ def train_regression_model(ml_model, method):
     # trained_model_filename = find_model_filename(method, ml_model, 'regression')
     # with open(trained_model_filename, 'wb') as trained_model_file:
     #     pickle.dump(reg, trained_model_file)
-    print("Real")
-    print(train_dataset['timings'][10:20])
-    print("Predicted")
-    print(reg.predict(train_dataset['features'])[10:20])
-    print(metrics.mean_squared_error(reg.predict(train_dataset['features']), train_dataset['timings']))
     return reg
 
 
@@ -130,7 +125,6 @@ def get_vars_features(polynomials):
     unique_features_filename = find_other_filename("unique_features")
     with open(unique_features_filename, 'wb') as unique_features_file:
         unique_names = pickle.load(unique_features_file)
-    print(unique_names)
     for var in range(nvar):
         var_features, var_names = \
             compute_features_for_var(polynomials, var)

@@ -1,18 +1,20 @@
 import csv
+import math
 import pickle
 import importlib.util
 import numpy as np
 from sklearn import metrics
 from config.general_values import dataset_qualities
 from config.ml_models import ml_models
+from config.ml_models import ml_regressors
 from find_filename import find_output_filename
 from find_filename import find_dataset_filename
 from find_filename import find_model_filename
 # Check if 'dataset_manipulation' is installed
 if isinstance(importlib.util.find_spec('dataset_manipulation'), type(None)):
-    from exploit_symmetries import give_all_symmetries
+    from dataset_manipulation import augmentate_instance
 else:
-    from packages.dataset_manipulation.exploit_symmetries import give_all_symmetries
+    from packages.dataset_manipulation.dataset_manipulation import augmentate_instance
 
 
 # def test_model(trained_model_filename, test_dataset_filename):
@@ -104,8 +106,15 @@ def test_model(ml_model, paradigm, testing_method='augmented'):
         model = pickle.load(trained_model_file)
     with open(test_dataset_filename, 'rb') as test_dataset_file:
         testing_dataset = pickle.load(test_dataset_file)
-    chosen_indices = [return_regressor_choice(model, features)
-                      for features in testing_dataset['features']]
+    print("here")
+    if ml_model in ml_regressors:
+        chosen_indices = [return_regressor_choice(model, features)
+                          for features in testing_dataset['features']]
+    else:
+        chosen_indices = [model.predict([features])[0]
+                          for features in testing_dataset['features']]
+    print(chosen_indices)
+    print("here2")
     return compute_metrics(chosen_indices,
                            testing_dataset['labels'],
                            testing_dataset['timings'],
@@ -123,6 +132,7 @@ def compute_metrics(chosen_indices, labels, all_timings, all_cells):
             zip(chosen_indices, labels, all_timings, all_cells):
         if chosen_index == label:
             correct += 1
+        print(timings, chosen_index)
         if timings[chosen_index] not in [30, 60]:
             metrics['Completed'] += 1
         metrics['Total time'] += timings[chosen_index]
@@ -135,11 +145,17 @@ def compute_metrics(chosen_indices, labels, all_timings, all_cells):
 
 
 def return_regressor_choice(model, features):
-    features_all_symmetries = give_all_symmetries(features)
+    nvar = 3 ## Make this better
+    made_up_timings = list(range(math.factorial(nvar)))
+    made_up_cells = list(range(math.factorial(nvar)))
+    augmentated_features, _, _ = \
+        augmentate_instance(features, made_up_timings, made_up_cells, nvar)
     y_op = float('inf')
-    for index, x_features in enumerate(features_all_symmetries):
-        # print(x_features)
+    for index, x_features in enumerate(augmentated_features):
         y_pred = model.predict([x_features])
+        ########
+        # THIS IS NOT A LIST??
+        ########
         # print(y_pred)
         if y_op > y_pred:
             y_op = y_pred

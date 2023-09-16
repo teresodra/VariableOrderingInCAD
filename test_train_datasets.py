@@ -57,20 +57,24 @@ def create_train_test_datasets():
                          dataset['cells'],
                          test_size=0.20,
                          random_state=random_state)
-    keys = ['features', 'labels', 'timings', 'cells']
+    keys = ['features', 'timings', 'cells']
     for purpose in purposes:
         datasets[f'{purpose}_Balanced'] = \
             {key: elem for key,
              elem in zip(keys, balance_dataset(
                                    *[datasets[f'{purpose}_Normal'][key2]
-                                     for key2 in keys]))
+                                     for key2 in keys], nvar=3)) ##CHOOSE NVAR WELL
              }
+        datasets[f'{purpose}_Balanced']['labels'] = \
+            [timings.index(min(timings)) for timings in datasets[f'{purpose}_Balanced']['timings']]
         datasets[f'{purpose}_Augmented'] = \
             {key: elem for key,
              elem in zip(keys, augmentate_dataset(
                                    *[datasets[f'{purpose}_Normal'][key2]
-                                     for key2 in keys]))
+                                     for key2 in keys], nvar=3))
              }
+        datasets[f'{purpose}_Augmented']['labels'] = \
+            [timings.index(min(timings)) for timings in datasets[f'{purpose}_Augmented']['timings']]
     for purpose in purposes:
         for quality in dataset_qualities:
             this_dataset_filename = \

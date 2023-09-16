@@ -4,35 +4,53 @@ import math
 import random
 from .exploit_symmetries import give_all_symmetries
 from .exploit_symmetries import augmentate_timings
+from itertools import permutations
 # from sklearn.preprocessing import normalize
 
 nvar = 3
 
 
-def augmentate_dataset(features, targets, timings, cells):
+def augmentate_instance(features, timings, cells, nvar):
+    variables = list(range(nvar))
+    split_features = [features[i*len(features)//nvar:(i+1)*len(features)//nvar]
+                      for i in range(nvar)]
+    dict_timings = {str(perm): timing for perm, timing
+                    in zip(permutations(variables), timings)}
+    dict_cells = {str(perm): cell for perm, cell in zip(permutations(variables), cells)}
+    augmented_features, augmented_timings, augmented_cells = [], [], []
+    for perm in permutations(variables):
+        augmented_features.append([feature for i in perm
+                                  for feature in split_features[i]])
+        augmented_timings.append([dict_timings[str(double_perm)]
+                                  for double_perm in permutations(perm)])
+        augmented_cells.append([dict_cells[str(double_perm)]
+                                for double_perm in permutations(perm)])
+    return augmented_features, augmented_timings, augmented_cells
+
+
+
+def augmentate_dataset(all_features, all_timings, all_cells, nvar):
     """
-    Multiply the size of the dataset by 6.
+    Multiply the size of the dataset by math.factorial(nvar).
 
     Arguments:
     features: list(list(numpy.float))
     targets: list(numpy.float)
     """
-    symmetric_features = []
-    symmetric_targets = []
-    symmetric_timings = []
-    symmetric_cells = []
-    for features, target, timing, cell in \
-            zip(features, targets, timings, cells):
-        symmetric_features += give_all_symmetries(features, int(target))
-        symmetric_targets += list(range(math.factorial(nvar)))
-        symmetric_timings += augmentate_timings(timing, int(target))
-        symmetric_cells += augmentate_timings(cell, int(target))
-
-    return np.array(symmetric_features), np.array(symmetric_targets), \
-        np.array(symmetric_timings), np.array(symmetric_cells)
+    augmented_features = []
+    augmented_timings = []
+    augmented_cells = []
+    for features, timings, cells in \
+            zip(all_features, all_timings, all_cells):
+        new_features, new_timings, new_cells = \
+            augmentate_instance(features, timings, cells, nvar)
+        augmented_features += new_features
+        augmented_timings += new_timings
+        augmented_cells += new_cells
+    return augmented_features, augmented_timings, augmented_cells
 
 
-def balance_dataset(features, targets, timings, cells):
+def balance_dataset(all_features, all_timings, all_cells, nvar):
     """
     Balance the dataset so all targets are almost equally common.
 
@@ -41,21 +59,22 @@ def balance_dataset(features, targets, timings, cells):
     targets: list(numpy.float)
     """
     balanced_features = []
-    balanced_targets = []
     balanced_timings = []
     balanced_cells = []
-    for features, target, timing, cell in \
-            zip(features, targets, timings, cells):
-        symmetric_features = give_all_symmetries(features, int(target))
-        symmetric_timings = augmentate_timings(timing, int(target))
-        symmetric_cells = augmentate_timings(cell, int(target))
+    for features, timings, cells in \
+            zip(all_features, all_timings, all_cells):
         new_target = random.choice(list(range(math.factorial(nvar))))
-        balanced_features.append(symmetric_features[new_target])
-        balanced_targets.append(new_target)
-        balanced_timings.append(symmetric_timings[new_target])
-        balanced_cells.append(symmetric_cells[new_target])
-    return np.array(balanced_features), np.array(balanced_targets),\
-        np.array(balanced_timings), np.array(balanced_cells)
+        new_features, new_timings, new_cells = \
+            augmentate_instance(features, timings, cells, nvar)
+        balanced_features.append(new_features[new_target])
+        balanced_timings.append(new_timings[new_target])
+        balanced_cells.append(new_cells[new_target])
+    return balanced_features, balanced_timings, balanced_cells
+
+# features = [1,2,3,4,5,6]
+# timings = [10,20,30,40,50,60]
+# cells = [21,32,43,54,65,76]
+# print(balance_dataset([features], [timings], [cells], 3))
 
 
 def name_unique_features(names, features):
