@@ -115,7 +115,7 @@ def compute_features_for_var(original_polynomials, var,
                         variable=var,
                         operations=operations)
     sdegrees = \
-        [[sum(monomial) for monomial in poly if monomial[var] != 0] + [0]
+        [[sum(monomial[:-1]) for monomial in poly if monomial[var] != 0] + [0]
          for poly in original_polynomials]
     svar_features, svar_features_names = \
         create_features(sdegrees,
