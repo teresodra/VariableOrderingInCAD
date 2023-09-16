@@ -73,26 +73,35 @@ def test_regression_model(method, regressor):
 #     print(ml_reg)
 #     test_regression_model('balanced', regressor)
 
-def train_reinforcement_model(ml_model, method='Augmented'):
+def train_reinforcement_model(ml_model, method='Normal'):
     train_data_filename = find_dataset_filename('Train', method=method)
     with open(train_data_filename, 'rb') as train_data_file:
         train_dataset = pickle.load(train_data_file)
-    hyperparams_file = find_hyperparams_filename(method, ml_model)
-    hyperparams = read_yaml_from_file(hyperparams_file)
+    # hyperparams_file = find_hyperparams_filename(method, ml_model)
+    # hyperparams = read_yaml_from_file(hyperparams_file)
     current_model = sklearn_models[ml_model]
-    model = current_model(**hyperparams)
+    # model = current_model(**hyperparams)
+    model = current_model()
+    first_polys = train_dataset['projections'][0][0][0]
+    first_features = get_vars_features(first_polys)
+    first_labels = [1]*len(first_features)
+    model.fit(first_features, first_labels)
     for projections, timings \
             in zip(train_dataset['projections'], train_dataset['timings']):
         training_features, training_labels = \
-            training_instances_reinforcement(model, projections)
+            training_instances_reinforcement(model, projections, timings)
         model.fit(training_features, training_labels)
-    
+    trained_model_filename = find_model_filename('reinforcement', ml_model)
+    with open(trained_model_filename, 'wb') as trained_model_file:
+        pickle.dump(model, trained_model_file)
 
 
 def training_instances_reinforcement(model, projections, timings):
     original_polynomials = projections[0][0]
     nvar = len(original_polynomials[0][0]) - 1
     vars_features = get_vars_features(original_polynomials)
+    print(len(vars_features[0]))
+    print(model.predict([vars_features[0]]))
     evaluations = [model.predict([var_features])[0]
                    for var_features in vars_features]
     timing = []
@@ -101,7 +110,7 @@ def training_instances_reinforcement(model, projections, timings):
         projected_polynomials = projections[var * math.factorial(nvar-1)][1]
         new_var = var_choice_reinforcement(model, projected_polynomials)
         ordering_chosen = new_var + var * math.factorial(nvar-1)
-        timing[var] = timings[ordering_chosen]
+        timing.append(timings[ordering_chosen])
     # now compute which part of the difference between 
     # evaluations[i]/evaluations[j] and timing[i]/timing[j]
     # corresponds to each evaluation
@@ -122,22 +131,41 @@ def get_vars_features(polynomials):
     in the given set of polynomials'''
     vars_features = []
     nvar = len(polynomials[0][0]) - 1
+    print('number of variabels', nvar)
     unique_features_filename = find_other_filename("unique_features")
-    with open(unique_features_filename, 'wb') as unique_features_file:
+    with open(unique_features_filename, 'rb') as unique_features_file:
         unique_names = pickle.load(unique_features_file)
     for var in range(nvar):
+        print('variabel', var)
         var_features, var_names = \
             compute_features_for_var(polynomials, var)
+        print('var_features', var_features)
         var_features = [feature for feature, name
                         in zip(var_features, var_names)
                         if name in unique_names]
-        vars_features += var_features
+        vars_features.append(var_features)
     return vars_features
 
 
 def var_choice_reinforcement(model, polynomials):
-    '''This function will return the next variable to project chosen by the model trained using reinforcement'''
-    vars_features = get_vars_features(model, polynomials)
-    evaluations = [model.predict([var_features])[0]
-                   for var_features in vars_features]
-    return evaluations.index(min(evaluations))
+    '''This function will return the next variable to project
+    chosen by the model trained using reinforcement'''
+    vars_features = get_vars_features(polynomials)
+    print(polynomials)
+    print(len(vars_features), len(vars_features[0]), '\n', vars_features)
+    evaluations = model.predict(vars_features)
+    return np.argmin(evaluations)
+
+
+def ordering_choice_reinforcement(model, projections):
+    '''This function will return the ordering chosen by the RL model'''
+    nvar = len(projections[0])
+    ordering = 0
+    for level in range(nvar-1):
+        polynomials = projections[ordering][level]
+        next_var = var_choice_reinforcement(model, polynomials)
+        ordering += next_var * math.factorial(nvar-1-level)
+    return ordering
+
+
+train_reinforcement_model('RFR')

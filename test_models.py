@@ -10,6 +10,7 @@ from config.ml_models import ml_regressors
 from find_filename import find_output_filename
 from find_filename import find_dataset_filename
 from find_filename import find_model_filename
+from train_models import ordering_choice_reinforcement
 # Check if 'dataset_manipulation' is installed
 if isinstance(importlib.util.find_spec('dataset_manipulation'), type(None)):
     from dataset_manipulation import augmentate_instance
@@ -107,12 +108,15 @@ def test_model(ml_model, paradigm, testing_method='augmented'):
     with open(test_dataset_filename, 'rb') as test_dataset_file:
         testing_dataset = pickle.load(test_dataset_file)
     print("here")
-    if ml_model in ml_regressors:
+    if ml_model in ml_regressors and paradigm == 'regression':
         chosen_indices = [return_regressor_choice(model, features)
                           for features in testing_dataset['features']]
-    else:
+    elif ml_model in ml_models:
         chosen_indices = [model.predict([features])[0]
                           for features in testing_dataset['features']]
+    elif paradigm == 'reinforcement' and testing_method == 'Normal':
+        chosen_indices = [ordering_choice_reinforcement(model, projections)
+                          for projections in testing_dataset['projections']]
     print(chosen_indices)
     print("here2")
     return compute_metrics(chosen_indices,

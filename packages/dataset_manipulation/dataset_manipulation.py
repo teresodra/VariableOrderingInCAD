@@ -118,10 +118,9 @@ def get_unique_feature_names(unique_names, names, features):
 
 def remove_notunique_features(names, features, nvar=3):
     # creating some targets and timing because the function requires them
-    targets = [0]*len(features)
     timings = [list(range(math.factorial(nvar)))]*len(features)
     cells = [list(range(math.factorial(nvar)))]*len(features)
-    augmented_features, _, _, _ = augmentate_dataset(features, targets, timings, cells)
+    augmented_features, _, _ = augmentate_dataset(features, timings, cells, nvar)
     # normalized_augmented_features = normalize(augmented_features)
     unique_names = name_unique_features(names, augmented_features)
     unique_features = []

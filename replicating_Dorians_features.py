@@ -105,7 +105,8 @@ def features_from_set_of_polys(original_polynomials,
     return names, instance_features
 
 
-def compute_features_for_var(original_polynomials, var, operations):
+def compute_features_for_var(original_polynomials, var,
+                             operations=[sum, max, aveg]):
     '''Given polynomials and a variable computes the features'''
     degrees = [[monomial[var] for monomial in poly]
                for poly in original_polynomials]
