@@ -98,7 +98,8 @@ for heuristic in ['T1', 'gmods', 'brown', 'random', 'virtual-best']:
 #         metrics = compute_metrics(chosen_indices,
 #                                   testing_dataset['labels'],
 #                                   testing_dataset['timings'],
-#                                   testing_dataset['cells'])
+#                                   testing_dataset['cells'],
+#                                   heuristic)
 #         if len(sum_metrics) == 0:
 #             sum_metrics = metrics
 #         else:

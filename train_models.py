@@ -80,7 +80,7 @@ def train_reinforcement_model(ml_model, method='Normal'):
     model = current_model()
     first_polys = train_dataset['projections'][0][0][0]
     first_features = get_vars_features(first_polys)
-    first_labels = [random.random() for _ in range([len(first_features)])]
+    first_labels = [random.random() for _ in range(len(first_features))]
     model.fit(first_features, first_labels)
     training_features, training_labels = [], []
     for i in range(30):
