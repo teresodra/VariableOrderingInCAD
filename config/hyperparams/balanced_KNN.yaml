@@ -1,3 +1,3 @@
-algorithm: auto
+algorithm: ball_tree
 n_neighbors: 1
 weights: uniform

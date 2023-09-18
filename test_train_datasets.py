@@ -73,6 +73,7 @@ def create_train_test_datasets():
                                    *[datasets[f'{purpose}_Normal'][key2]
                                      for key2 in keys], nvar=3))
              }
+        print(f"features in {purpose}_Augmented", len(datasets[f'{purpose}_Augmented']['features'][0]))
         datasets[f'{purpose}_Augmented']['labels'] = \
             [timings.index(min(timings)) for timings in datasets[f'{purpose}_Augmented']['timings']]
     for purpose in purposes:
@@ -135,4 +136,6 @@ def create_regression_datasets(taking_logarithms=True):
             # print(classification_dataset['labels'])
 
 
-create_regression_datasets(taking_logarithms=False)
+# create_regression_datasets(taking_logarithms=False)
+
+# create_train_test_datasets()

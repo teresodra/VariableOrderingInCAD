@@ -1,5 +1,5 @@
 import os
-from config.general_values import dataset_qualities
+# from config.general_values import dataset_qualities
 from config.general_values import purposes
 
 
@@ -49,8 +49,6 @@ def find_other_filename(search):
                         f'{search}.txt')
 
 
-import pickle
-names_filename = find_other_filename('unique_names')
-with open(names_filename, 'rb') as names_f:
-    names = pickle.load(names_f)
-print(len(names), '\n', names[2], '\n', names[67], '\n', names[132])
+def find_timings_lists(model):
+    return os.path.join(os.path.dirname(__file__), 'results',
+                        'timings_lists', f'{model}.txt')

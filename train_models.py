@@ -1,5 +1,6 @@
 import math
 import pickle
+import random
 from yaml_tools import read_yaml_from_file
 from config.ml_models import sklearn_models
 from config.ml_models import ml_regressors
@@ -12,6 +13,7 @@ import numpy as np
 from sklearn import metrics
 from itertools import combinations
 from replicating_Dorians_features import compute_features_for_var
+from test_models import compute_metrics
 
 
 def train_model(ml_model, method):
@@ -67,12 +69,6 @@ def test_regression_model(method, regressor):
     y_pred = [choose_using_regression(x_i, regressor) for x_i in x_test]
 
 
-# for ml_reg in ml_regressors:
-#     print(ml_reg)
-#     regressor = train_regression_model(ml_reg, 'balanced')
-#     print(ml_reg)
-#     test_regression_model('balanced', regressor)
-
 def train_reinforcement_model(ml_model, method='Normal'):
     train_data_filename = find_dataset_filename('Train', method=method)
     with open(train_data_filename, 'rb') as train_data_file:
@@ -84,13 +80,18 @@ def train_reinforcement_model(ml_model, method='Normal'):
     model = current_model()
     first_polys = train_dataset['projections'][0][0][0]
     first_features = get_vars_features(first_polys)
-    first_labels = [1]*len(first_features)
+    first_labels = [random.random() for _ in range([len(first_features)])]
     model.fit(first_features, first_labels)
-    for projections, timings \
-            in zip(train_dataset['projections'], train_dataset['timings']):
-        training_features, training_labels = \
-            training_instances_reinforcement(model, projections, timings)
+    training_features, training_labels = [], []
+    for i in range(30):
+        for projections, timings \
+                in zip(train_dataset['projections'], train_dataset['timings']):
+            new_training_features, new_training_labels = \
+                training_instances_reinforcement(model, projections, timings)
+            training_features += new_training_features
+            training_labels += new_training_labels
         model.fit(training_features, training_labels)
+        print(test_reinforcement_model(model))
     trained_model_filename = find_model_filename('reinforcement', ml_model)
     with open(trained_model_filename, 'wb') as trained_model_file:
         pickle.dump(model, trained_model_file)
@@ -100,8 +101,6 @@ def training_instances_reinforcement(model, projections, timings):
     original_polynomials = projections[0][0]
     nvar = len(original_polynomials[0][0]) - 1
     vars_features = get_vars_features(original_polynomials)
-    print(len(vars_features[0]))
-    print(model.predict([vars_features[0]]))
     evaluations = [model.predict([var_features])[0]
                    for var_features in vars_features]
     timing = []
@@ -119,7 +118,7 @@ def training_instances_reinforcement(model, projections, timings):
     pairs = list(combinations(range(nvar), 2))
     for i, j in pairs:
         correction_coefficient = \
-            math.sqrt((timing[j]/timing[j])/(evaluations[i]/evaluations[j]))
+            math.sqrt((timing[i]/timing[j])/(evaluations[i]/evaluations[j]))
         instances_features += [vars_features[i], vars_features[j]]
         instances_labels += [evaluations[i]*correction_coefficient,
                              evaluations[j]/correction_coefficient]
@@ -131,15 +130,12 @@ def get_vars_features(polynomials):
     in the given set of polynomials'''
     vars_features = []
     nvar = len(polynomials[0][0]) - 1
-    print('number of variabels', nvar)
     unique_features_filename = find_other_filename("unique_features")
     with open(unique_features_filename, 'rb') as unique_features_file:
         unique_names = pickle.load(unique_features_file)
     for var in range(nvar):
-        print('variabel', var)
         var_features, var_names = \
             compute_features_for_var(polynomials, var)
-        print('var_features', var_features)
         var_features = [feature for feature, name
                         in zip(var_features, var_names)
                         if name in unique_names]
@@ -151,8 +147,6 @@ def var_choice_reinforcement(model, polynomials):
     '''This function will return the next variable to project
     chosen by the model trained using reinforcement'''
     vars_features = get_vars_features(polynomials)
-    print(polynomials)
-    print(len(vars_features), len(vars_features[0]), '\n', vars_features)
     evaluations = model.predict(vars_features)
     return np.argmin(evaluations)
 
@@ -168,4 +162,22 @@ def ordering_choice_reinforcement(model, projections):
     return ordering
 
 
-train_reinforcement_model('RFR')
+def test_reinforcement_model(ml_model, method='Normal', nvar=3):
+    train_data_filename = find_dataset_filename('Test', method=method)
+    with open(train_data_filename, 'rb') as train_data_file:
+        testing_dataset = pickle.load(train_data_file)
+    # trained_model_filename = find_model_filename('reinforcement', ml_model)
+    # with open(trained_model_filename, 'rb') as trained_model_file:
+    #     model = pickle.load(trained_model_file)
+    model = ml_model
+    chosen_indices = [ordering_choice_reinforcement(model, projections)
+                      for projections in testing_dataset['projections']]
+    metrics = compute_metrics(chosen_indices,
+                              testing_dataset['labels'],
+                              testing_dataset['timings'],
+                              testing_dataset['cells'],
+                              'reinfocement')
+    augmented_metrics = {key: metrics[key] if key in ['Accuracy', 'Markup']
+                         else math.factorial(nvar)*metrics[key]
+                         for key in metrics}
+    return augmented_metrics

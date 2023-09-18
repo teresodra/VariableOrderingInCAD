@@ -2,6 +2,7 @@
 the sets of polynomials and its timings for each order, creates a dataset
 containing a set of unique features and its class"""
 
+import re
 import pickle
 import numpy as np
 from replicating_Dorians_features import extract_features
@@ -52,6 +53,7 @@ def cleaning_dataset():
     clean_dataset['names'], clean_dataset['features'] = \
         remove_notunique_features(my_dataset['names'],
                                   my_dataset['features'])
+    print("features in normal", len(my_dataset['features'][0]))
     unique_features_filename = find_other_filename("unique_features")
     with open(unique_features_filename, 'wb') as unique_features_file:
         pickle.dump(clean_dataset['names'], unique_features_file)
@@ -60,10 +62,13 @@ def cleaning_dataset():
         np.array([[convert_to_timing(timings_ordering)
                   for timings_ordering in timings_problem]
                   for timings_problem in my_dataset['timings']])
+    # Some cells are expressed as "Over 30", this is changed here
+    clean_dataset['cells'] = \
+        np.array([convert_to_cells(cells_problem)
+                  for cells_problem in my_dataset['cells']])
     for key in my_dataset:
         if key not in clean_dataset:
             clean_dataset[key] = my_dataset[key]
-    print("CLEAN", clean_dataset.keys())
     with open(clean_dataset_filename, 'wb') as clean_dataset_file:
         pickle.dump(clean_dataset, clean_dataset_file)
 
@@ -76,9 +81,32 @@ def cleaning_dataset():
 # cleaning_dataset(dataset_filename, clean_dataset_filename)
 
 
-def convert_to_timing(timing_str):
-    if timing_str == "Over 30":
-        return 60
-    if timing_str == "Over 60":
-        return 120
+def convert_to_timing(timing_str, penalization=2):
+    if not contains_float(timing_str):
+        print(penalization * float(timing_str[5:]))
+        return penalization * float(timing_str[5:])
     return float(timing_str)
+
+
+def convert_to_cells(cells, penalization=2):
+    int_cells = [int(cell) if contains_int(cell) else cell
+                 for cell in cells]
+    max_cells = max([cell for cell in int_cells if type(cell) == int])
+    penalization_cells = [cell if type(cell) == int
+                          else penalization*max_cells
+                          for cell in int_cells]
+    return penalization_cells
+
+
+def contains_float(input_str):
+    float_pattern = r'^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$'
+    match = re.search(float_pattern, input_str)
+    return match is not None
+
+
+def contains_int(input_str):
+    int_pattern = r'^[-+]?\d+$'
+    match = re.match(int_pattern, input_str)
+    return match is not None
+
+cleaning_dataset()

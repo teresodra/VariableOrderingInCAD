@@ -6,15 +6,7 @@ YES, IT IS!
 import itertools
 # from xml.sax.handler import all_features
 import numpy as np
-
-
-def aveg(given_list):
-    return sum(given_list)/len(given_list)
-
-
-def aveg_not_zero(given_list):
-    return sum(given_list)/max(1, len([1 for elem in given_list
-                                      if elem != 0]))
+from config.general_values import operations
 
 
 def identity(input):
@@ -35,8 +27,7 @@ def sign(input):
             raise Exception("How is this possible?")
 
 
-def create_features(degrees, variable=0, sv=False,
-                    operations=[sum, max, aveg, aveg_not_zero]):
+def create_features(degrees, variable=0, sv=False):
     sign_or_not = [identity, sign]
     features = []
     features_names = []
@@ -66,6 +57,8 @@ def extract_features(dataset):
     all_original_polynomials = []
     all_projections = []
     all_cells = []
+    for index, elem in enumerate(dataset):
+        print(index, elem[0])
     for index, projections in enumerate(dataset[0]):
         all_projections.append(projections)
         original_polynomials = projections[0][0]
@@ -74,11 +67,9 @@ def extract_features(dataset):
         all_original_polynomials.append(original_polynomials)
         all_labels.append(dataset[1][index])
         all_timings.append(dataset[2][index])
-        all_cells.append(dataset[3][index])
+        all_cells.append(dataset[4][index])
         names, instance_features = \
-            features_from_set_of_polys(
-                original_polynomials,
-                operations=[sum, max, aveg, aveg_not_zero])
+            features_from_set_of_polys(original_polynomials)
         all_features.append(instance_features)
     my_dataset['polynomials'] = np.array(all_original_polynomials)
     my_dataset['names'] = np.array(names)
@@ -90,38 +81,33 @@ def extract_features(dataset):
     return my_dataset
 
 
-def features_from_set_of_polys(original_polynomials,
-                               operations=[sum, max, aveg, aveg_not_zero]):
+def features_from_set_of_polys(original_polynomials):
     instance_features = []
     names = []
     nvar = len(original_polynomials[0][0]) - 1
     for var in range(nvar):
         var_features, var_names = \
             compute_features_for_var(original_polynomials,
-                                     var,
-                                     operations=operations)
+                                     var)
         instance_features += var_features
         names += var_names
     return names, instance_features
 
 
-def compute_features_for_var(original_polynomials, var,
-                             operations=[sum, max, aveg]):
+def compute_features_for_var(original_polynomials, var):
     '''Given polynomials and a variable computes the features'''
     degrees = [[monomial[var] for monomial in poly]
                for poly in original_polynomials]
     var_features, var_features_names = \
         create_features(degrees,
-                        variable=var,
-                        operations=operations)
+                        variable=var)
     sdegrees = \
         [[sum(monomial[:-1]) for monomial in poly if monomial[var] != 0] + [0]
          for poly in original_polynomials]
     svar_features, svar_features_names = \
         create_features(sdegrees,
                         variable=var,
-                        sv=True,
-                        operations=operations)
+                        sv=True)
     var_names = var_features_names + svar_features_names
     var_features = var_features + svar_features
     return var_features, var_names

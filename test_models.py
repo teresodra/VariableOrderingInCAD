@@ -10,7 +10,9 @@ from config.ml_models import ml_regressors
 from find_filename import find_output_filename
 from find_filename import find_dataset_filename
 from find_filename import find_model_filename
-from train_models import ordering_choice_reinforcement
+from find_filename import find_timings_lists
+# from train_models import ordering_choice_reinforcement
+# from train_models import training_instances_reinforcement
 # Check if 'dataset_manipulation' is installed
 if isinstance(importlib.util.find_spec('dataset_manipulation'), type(None)):
     from dataset_manipulation import augmentate_instance
@@ -41,9 +43,6 @@ def test_results(training_method):
                                                               testing_method)
                 accuracy[testing_method] = test_model(trained_model_filename,
                                                       test_dataset_filename)
-                print('testing_method', testing_method)
-                print('ml_model', ml_model)
-                print('acc', accuracy[testing_method])
             round_accuracies = [round(acc, 2)
                                 for acc in [accuracy[method]
                                 for method in dataset_qualities]]
@@ -100,48 +99,54 @@ def test_regressor(ml_model):
 def test_model(ml_model, paradigm, testing_method='augmented'):
     trained_model_filename = find_model_filename(paradigm,
                                                  ml_model)
-    print(trained_model_filename, paradigm, ml_model)
+    # print(trained_model_filename, paradigm, ml_model)
     test_dataset_filename = find_dataset_filename('Test',
                                                   testing_method)
     with open(trained_model_filename, 'rb') as trained_model_file:
         model = pickle.load(trained_model_file)
     with open(test_dataset_filename, 'rb') as test_dataset_file:
         testing_dataset = pickle.load(test_dataset_file)
-    print("here")
     if ml_model in ml_regressors and paradigm == 'regression':
         chosen_indices = [return_regressor_choice(model, features)
                           for features in testing_dataset['features']]
     elif ml_model in ml_models:
+        # print('testing_method', testing_method)
         chosen_indices = [model.predict([features])[0]
                           for features in testing_dataset['features']]
     elif paradigm == 'reinforcement' and testing_method == 'Normal':
         chosen_indices = [ordering_choice_reinforcement(model, projections)
                           for projections in testing_dataset['projections']]
-    print(chosen_indices)
-    print("here2")
+    # print(chosen_indices)
+    # print("here2")
     return compute_metrics(chosen_indices,
                            testing_dataset['labels'],
                            testing_dataset['timings'],
-                           testing_dataset['cells'])
+                           testing_dataset['cells'],
+                           ml_model)
 
 
-def compute_metrics(chosen_indices, labels, all_timings, all_cells):
+def compute_metrics(chosen_indices, labels, all_timings, all_cells, model):
     metrics = dict()
     correct = 0
-    metrics['Total time'] = 0
+    metrics['TotalTime'] = 0
     total_markup = 0
     metrics['Completed'] = 0
-    metrics['Total cells'] = 0
+    metrics['TotalCells'] = 0
+    # REmove follwoign loop
     for chosen_index, label, timings, cells in \
             zip(chosen_indices, labels, all_timings, all_cells):
         if chosen_index == label:
             correct += 1
-        print(timings, chosen_index)
         if timings[chosen_index] not in [30, 60]:
             metrics['Completed'] += 1
-        metrics['Total time'] += timings[chosen_index]
         total_markup += (timings[chosen_index]-timings[label])/(timings[label] + 1)
-        metrics['Total cells'] += cells[chosen_index]
+        metrics['TotalCells'] += cells[chosen_index]
+    chosen_times = [timings[index] for index, timings
+                    in zip(chosen_indices, all_timings)]
+    timings_lists_filename = find_timings_lists(model)
+    with open(timings_lists_filename, 'wb') as timings_lists_file:
+        pickle.dump(chosen_times, timings_lists_file)
+    metrics['TotalTime'] = sum(chosen_times)
     total_instances = len(chosen_indices)
     metrics['Accuracy'] = correct/total_instances
     metrics['Markup'] = total_markup/total_instances
@@ -149,7 +154,7 @@ def compute_metrics(chosen_indices, labels, all_timings, all_cells):
 
 
 def return_regressor_choice(model, features):
-    nvar = 3 ## Make this better
+    nvar = 3  # Make this better
     made_up_timings = list(range(math.factorial(nvar)))
     made_up_cells = list(range(math.factorial(nvar)))
     augmentated_features, _, _ = \

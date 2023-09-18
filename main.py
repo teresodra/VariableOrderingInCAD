@@ -31,6 +31,7 @@ from test_models import test_model
 # if tune_hyperparameters is used to decide whether to tune them
 # or to used previously tuned
 tune_hyperparameters = False
+train_the_models = True
 paradigm = 'classification'
 
 cleaning_dataset()
@@ -41,11 +42,12 @@ if tune_hyperparameters:
         for method in dataset_qualities:
             print(f"Choosing hyperparameters for {ml_model} in {method}")
             choose_hyperparams(ml_model, method)
-# for ml_model in ml_models:
-#     print(f"Training {ml_model}")
-#     for method in dataset_qualities:
-#         print(f"for {method}")
-#         train_model(ml_model, method)
+if train_the_models:
+    for ml_model in ml_models:
+        print(f"Training {ml_model}")
+        for method in dataset_qualities:
+            print(f"for {method}")
+            train_model(ml_model, method)
 training_method = 'augmented'
 testing_method = 'augmented'
 first_time = 1
