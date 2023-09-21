@@ -52,9 +52,9 @@ def choose_variables_minimizing(degrees_list, measure='gmods', var_list=''):
     # elif measure == 'avegsumdeg':
     #     sum_degrees_overall_polys = [np.average([sum([monomial[var] for monomial in polynomial]) for polynomial in degrees_list]) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
     #     return [var_list[i] for i in range(len(var_list)) if i in minimum_indices(sum_degrees_overall_polys)] # var_list is filtered
-    # elif measure == 'avegavegdeg':
-    #     aveg_degrees_overall_polys = [np.average([np.average([monomial[var] for monomial in polynomial]) for polynomial in degrees_list]) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
-    #     return [var_list[i] for i in range(len(var_list)) if i in minimum_indices(aveg_degrees_overall_polys)] # var_list is filtered
+    elif measure == 'avegavegdeg':
+        aveg_degrees_overall_polys = [np.average([np.average([monomial[var] for monomial in polynomial]) for polynomial in degrees_list]) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
+        return [var_list[i] for i in range(len(var_list)) if i in minimum_indices(aveg_degrees_overall_polys)] # var_list is filtered
 
     # elif measure == 'maxsumdeg':
     #     sum_degrees_overall_polys = [max([sum([monomial[var] for monomial in polynomial]) for polynomial in degrees_list]) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
@@ -62,9 +62,9 @@ def choose_variables_minimizing(degrees_list, measure='gmods', var_list=''):
     elif measure == 'sumsignsumdeg':
         sum_degrees_overall_polys = [np.sum(np.sign([np.sum([monomial[var] for monomial in polynomial]) for polynomial in degrees_list])) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
         return [var_list[i] for i in range(len(var_list)) if i in minimum_indices(sum_degrees_overall_polys)] # var_list is filtered
-    # elif measure == 'sumsumdeg':
-    #     sum_degrees_overall_polys = [sum([sum([monomial[var] for monomial in polynomial]) for polynomial in degrees_list]) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
-    #     return [var_list[i] for i in range(len(var_list)) if i in minimum_indices(sum_degrees_overall_polys)] # var_list is filtered
+    elif measure == 'sumsumdeg':
+        sum_degrees_overall_polys = [sum([sum([monomial[var] for monomial in polynomial]) for polynomial in degrees_list]) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
+        return [var_list[i] for i in range(len(var_list)) if i in minimum_indices(sum_degrees_overall_polys)] # var_list is filtered
     # elif measure == 'avegvegsigndeg':
     #     sum_degrees_overall_polys = [np.average([np.average([np.sign(monomial[var]) for monomial in polynomial]) for polynomial in degrees_list]) for var in var_list] # for each variable, the total degree of each polynomial is computed. Then for each variable this values are added because is what we really care about. 
     #     return [var_list[i] for i in range(len(var_list)) if i in minimum_indices(sum_degrees_overall_polys)] # var_list is filtered
@@ -119,6 +119,8 @@ def choose_variables_minimizing(degrees_list, measure='gmods', var_list=''):
 def get_order_measure(heuristic, if_tie='random'):
     if heuristic == 'brown':
         order_measure = ['brown1', 'brown2', 'brown3', if_tie]
+    elif heuristic == 'T1':
+        order_measure = ['gmods', 'avegavegdeg', 'sumsumdeg']
     elif type(heuristic) == int:
         order_measure = list(paper_all_pos[heuristic])+[if_tie]
     else:

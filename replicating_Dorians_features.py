@@ -57,8 +57,6 @@ def extract_features(dataset):
     all_original_polynomials = []
     all_projections = []
     all_cells = []
-    for index, elem in enumerate(dataset):
-        print(index, elem[0])
     for index, projections in enumerate(dataset[0]):
         all_projections.append(projections)
         original_polynomials = projections[0][0]

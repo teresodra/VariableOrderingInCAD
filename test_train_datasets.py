@@ -116,11 +116,9 @@ def create_regression_datasets(taking_logarithms=True):
         # we will use the augmented dataset here
         with open(this_dataset_filename, 'rb') as this_dataset_file:
             regression_dataset = pickle.load(this_dataset_file)
-            # print("regression_dataset['timings']", len(regression_dataset['timings']), regression_dataset['timings'])
             regression_dataset['labels'] = \
                 [timings[0] for timings
                  in regression_dataset['timings']]
-            # print("regression_dataset['labels']", len(regression_dataset['labels']), regression_dataset['labels'])
             if taking_logarithms:
                 regression_dataset['labels'] = \
                     [log(label) for label
@@ -133,7 +131,6 @@ def create_regression_datasets(taking_logarithms=True):
             # classification_dataset['labels'] = \
             #     [np.argmin(timings) for timings
             #      in regression_dataset['timings']]
-            # print(classification_dataset['labels'])
 
 
 # create_regression_datasets(taking_logarithms=False)

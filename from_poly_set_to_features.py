@@ -118,8 +118,6 @@ def get_standarized_features(names, features):
         standarizing_values = pickle.load(standarizing_values_file)
     # we keep only the features that are unique
     standarized_features = []
-    # for featurex in zip(*features):
-    #     print(type(featurex), len(features))
     index = 0
     for index, feature in enumerate(zip(*features)):
         mean, std = standarizing_values[names[index]]

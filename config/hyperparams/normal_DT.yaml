@@ -1,3 +1,0 @@
-criterion: gini
-max_depth: 10
-splitter: random

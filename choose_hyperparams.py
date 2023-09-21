@@ -1,8 +1,8 @@
 import os
 import pickle
 import csv
-from config.ml_models import ml_models
-from config.ml_models import sklearn_models
+from config.ml_models import classifiers
+from config.ml_models import all_models
 from config.general_values import dataset_qualities
 from config.hyperparameters_grid import grid
 from sklearn.model_selection import GridSearchCV
@@ -17,7 +17,7 @@ def k_folds_ml(x_train, y_train, model, random_state=0):
 
     The hyperparameters of the models are chosen using 5-fold cross validation.
     """
-    current_classifier = sklearn_models[model]
+    current_classifier = all_models[model]
     current_grid = grid[model]
     rf_cv = GridSearchCV(estimator=current_classifier(),
                          param_grid=current_grid,
@@ -63,7 +63,7 @@ def choose_hyperparams(ml_model, method):
 #     with open(output_file_normal, 'w') as f_normal:
 #         writer_normal = csv.writer(f_normal)
 #         writer_normal.writerow(["Name"] + dataset_qualities)
-#         for ml_model in ml_models:
+#         for ml_model in classifiers:
 #             print(f"Model: {ml_model}")
 #             acc_balanced = dict()
 #             acc_normal = dict()
@@ -79,7 +79,7 @@ def choose_hyperparams(ml_model, method):
 #                                    os.path.join(os.path.dirname(__file__),
 #                                                 'config', 'hyperparams',
 #                                                 f'{method}_{ml_model}'))
-#                 current_classifier = sklearn_models[ml_model]
+#                 current_classifier = all_models[ml_model]
 #                 clf = current_classifier(**hyperparams)
 #                 clf.fit(x_train, y_train)
 #                 acc_balanced[method] = clf.score(balanced_x_test,

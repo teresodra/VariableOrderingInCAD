@@ -96,4 +96,4 @@ def create_adversarial_plot(
     plt.cla()
 
 
-create_adversarial_plot()
+# create_adversarial_plot()

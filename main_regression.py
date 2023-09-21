@@ -57,7 +57,7 @@ for i in range(1):
         # C:\Software\Python37\Lib\site-packages\sklearn\neighbors\_regression.py
         print(f"Testing models trained in {ml_model}")
         metrics = test_model(ml_model, paradigm=paradigm,
-                            testing_method=testing_method)
+                             testing_method=testing_method)
         if first_time == 1:
             first_time = 0
             keys = list(metrics.keys())

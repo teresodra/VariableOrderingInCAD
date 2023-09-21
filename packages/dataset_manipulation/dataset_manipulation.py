@@ -28,7 +28,6 @@ def augmentate_instance(features, timings, cells, nvar):
     return augmented_features, augmented_timings, augmented_cells
 
 
-
 def augmentate_dataset(all_features, all_timings, all_cells, nvar):
     """
     Multiply the size of the dataset by math.factorial(nvar).

@@ -1,8 +1,0 @@
-activation: tanh
-alpha: 0.005
-hidden_layer_sizes: !!python/tuple
-- 20
-- 20
-learning_rate: adaptive
-max_iter: 1000
-solver: adam

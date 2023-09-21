@@ -1,3 +1,0 @@
-criterion: gini
-max_depth: 4
-splitter: best

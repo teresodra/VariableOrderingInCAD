@@ -5,8 +5,10 @@ import importlib.util
 import numpy as np
 from sklearn import metrics
 from config.general_values import dataset_qualities
-from config.ml_models import ml_models
-from config.ml_models import ml_regressors
+from config.ml_models import all_models
+from config.ml_models import regressors
+from config.ml_models import classifiers
+from config.ml_models import heuristics
 from find_filename import find_output_filename
 from find_filename import find_dataset_filename
 from find_filename import find_model_filename
@@ -34,7 +36,7 @@ def test_results(training_method):
     with open(output_filename, 'w') as output_file:
         writer_balanced = csv.writer(output_file)
         writer_balanced.writerow(["Name"] + dataset_qualities)
-        for ml_model in ml_models:
+        for ml_model in all_models:
             trained_model_filename = find_model_filename(training_method,
                                                          ml_model)
             accuracy = dict()
@@ -97,27 +99,15 @@ def test_regressor(ml_model):
 
 
 def test_model(ml_model, paradigm, testing_method='augmented'):
-    trained_model_filename = find_model_filename(paradigm,
-                                                 ml_model)
-    # print(trained_model_filename, paradigm, ml_model)
     test_dataset_filename = find_dataset_filename('Test',
                                                   testing_method)
-    with open(trained_model_filename, 'rb') as trained_model_file:
-        model = pickle.load(trained_model_file)
     with open(test_dataset_filename, 'rb') as test_dataset_file:
         testing_dataset = pickle.load(test_dataset_file)
-    if ml_model in ml_regressors and paradigm == 'regression':
-        chosen_indices = [return_regressor_choice(model, features)
-                          for features in testing_dataset['features']]
-    elif ml_model in ml_models:
-        # print('testing_method', testing_method)
-        chosen_indices = [model.predict([features])[0]
-                          for features in testing_dataset['features']]
-    elif paradigm == 'reinforcement' and testing_method == 'Normal':
-        chosen_indices = [ordering_choice_reinforcement(model, projections)
-                          for projections in testing_dataset['projections']]
-    # print(chosen_indices)
-    # print("here2")
+    trained_model_filename = find_model_filename(paradigm,
+                                                 ml_model)
+    with open(trained_model_filename, 'rb') as trained_model_file:
+        model = pickle.load(trained_model_file)
+    chosen_indices = choose_indices(model, testing_dataset)
     return compute_metrics(chosen_indices,
                            testing_dataset['labels'],
                            testing_dataset['timings'],
@@ -125,7 +115,28 @@ def test_model(ml_model, paradigm, testing_method='augmented'):
                            ml_model)
 
 
-def compute_metrics(chosen_indices, labels, all_timings, all_cells, model):
+def choose_indices(ml_model, dataset, paradigm=''):
+    trained_model_filename = find_model_filename(paradigm, ml_model)
+    with open(trained_model_filename, 'rb') as trained_model_file:
+        model = pickle.load(trained_model_file)
+    if ml_model in regressors:
+        chosen_indices = [return_regressor_choice(model, features)
+                          for features in dataset['features']]
+    elif ml_model in classifiers:
+        chosen_indices = [model.predict([features])[0]
+                          for features in dataset['features']]
+    elif paradigm == 'reinforcement':
+        chosen_indices = [ordering_choice_reinforcement(model, projections)
+                          for projections in dataset['projections']]
+    elif ml_model in heuristics:
+        ordering_choices_heuristics(model, dataset)
+    return chosen_indices
+
+
+def compute_metrics(chosen_indices, testing_dataset):
+    labels = testing_dataset['labels']
+    all_timings = testing_dataset['timings']
+    all_cells = testing_dataset['cells']
     metrics = dict()
     correct = 0
     metrics['TotalTime'] = 0
@@ -143,9 +154,6 @@ def compute_metrics(chosen_indices, labels, all_timings, all_cells, model):
         metrics['TotalCells'] += cells[chosen_index]
     chosen_times = [timings[index] for index, timings
                     in zip(chosen_indices, all_timings)]
-    timings_lists_filename = find_timings_lists(model)
-    with open(timings_lists_filename, 'wb') as timings_lists_file:
-        pickle.dump(chosen_times, timings_lists_file)
     metrics['TotalTime'] = sum(chosen_times)
     total_instances = len(chosen_indices)
     metrics['Accuracy'] = correct/total_instances

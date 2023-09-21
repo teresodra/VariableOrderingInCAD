@@ -10,9 +10,9 @@ from .heuristics_rules import *
 from .heuristic_tools import greedy_heuristics, expensive_heuristics, create_pseudorderings, ml_models
 
 
-def choose_order_given_projections(projections, method="gmods"):
+def ordering_given_projections(projections, method="gmods"):
     '''Returns the order guessed by the heuristic requested'''
-    if method in greedy_heuristics or type(method) == int:
+    if method in greedy_heuristics or type(method) == int or method == 'T1':
         guess = greedy_heuristic_guess(projections, heuristic=method)
         return guess
     elif method in expensive_heuristics:

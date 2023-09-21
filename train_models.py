@@ -2,15 +2,14 @@ import math
 import pickle
 import random
 from yaml_tools import read_yaml_from_file
-from config.ml_models import sklearn_models
-from config.ml_models import ml_regressors
+from config.ml_models import all_models
 from find_filename import find_dataset_filename
 from find_filename import find_hyperparams_filename
 from find_filename import find_model_filename
 from find_filename import find_other_filename
 from dataset_manipulation import give_all_symmetries
 import numpy as np
-from sklearn import metrics
+# from sklearn import metrics
 from itertools import combinations
 from replicating_Dorians_features import compute_features_for_var
 from test_models import compute_metrics
@@ -22,13 +21,16 @@ def train_model(ml_model, method):
     with open(train_data_filename, 'rb') as train_data_file:
         train_dataset = pickle.load(train_data_file)
     hyperparams = read_yaml_from_file(hyperparams_file)
-    current_model = sklearn_models[ml_model]
+    current_model = all_models[ml_model]
     model = current_model(**hyperparams)
     # model = current_model()
+    print('here')
     model.fit(train_dataset['features'], train_dataset['labels'])
     trained_model_filename = find_model_filename(method, ml_model)
+    print('here2')
     with open(trained_model_filename, 'wb') as trained_model_file:
         pickle.dump(model, trained_model_file)
+    return model
 
 
 def train_regression_model(ml_model, method):
@@ -75,7 +77,7 @@ def train_reinforcement_model(ml_model, method='Normal'):
         train_dataset = pickle.load(train_data_file)
     # hyperparams_file = find_hyperparams_filename(method, ml_model)
     # hyperparams = read_yaml_from_file(hyperparams_file)
-    current_model = sklearn_models[ml_model]
+    current_model = all_models[ml_model]
     # model = current_model(**hyperparams)
     model = current_model()
     first_polys = train_dataset['projections'][0][0][0]
@@ -148,7 +150,10 @@ def var_choice_reinforcement(model, polynomials):
     chosen by the model trained using reinforcement'''
     vars_features = get_vars_features(polynomials)
     evaluations = model.predict(vars_features)
-    return np.argmin(evaluations)
+    min_value = np.min(evaluations)
+    min_indices = np.where(evaluations == min_value)[0]
+    # Randomly select one of the minimal indices
+    return np.random.choice(min_indices)
 
 
 def ordering_choice_reinforcement(model, projections):

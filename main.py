@@ -30,7 +30,7 @@ from test_models import test_model
 # Hyperparameter tuning take a very long time,
 # if tune_hyperparameters is used to decide whether to tune them
 # or to used previously tuned
-tune_hyperparameters = False
+tune_hyperparameters = True
 train_the_models = True
 paradigm = 'classification'
 

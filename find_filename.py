@@ -3,16 +3,16 @@ import os
 from config.general_values import purposes
 
 
-def find_hyperparams_filename(method, ml_model):
+def find_hyperparams_filename(model_name, paradigm, training_quality):
     return os.path.join(os.path.dirname(__file__),
                         'config', 'hyperparams',
-                        f'{method}_{ml_model}')
+                        f'{model_name}-{paradigm}-{training_quality}')
 
 
-def find_model_filename(method, ml_model):
+def find_model_filename(model_name, paradigm, training_quality):
     return os.path.join(os.path.dirname(__file__),
                         'config', 'models',
-                        f'{method}_{ml_model}.txt')
+                        f'{model_name}-{paradigm}-{training_quality}.txt')
 
 
 def find_dataset_filename(purpose, method=None):
