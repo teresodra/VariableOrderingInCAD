@@ -34,6 +34,7 @@ tune_hyperparameters = True
 train_the_models = True
 paradigm = 'classification'
 
+print("MAIN.PY")
 cleaning_dataset()
 create_train_test_datasets()
 

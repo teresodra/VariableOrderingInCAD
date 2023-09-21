@@ -12,7 +12,7 @@ from config.ml_models import heuristics
 from find_filename import find_output_filename
 from find_filename import find_dataset_filename
 from find_filename import find_model_filename
-from find_filename import find_timings_lists
+from main_heuristics import ordering_choices_heuristics
 # from train_models import ordering_choice_reinforcement
 # from train_models import training_instances_reinforcement
 # Check if 'dataset_manipulation' is installed
@@ -52,8 +52,8 @@ def test_results(training_method):
                                      round_accuracies)
 
 
-def test_classifier(ml_model, testing_method='augmented'):
-    trained_model_filename = find_model_filename('classification',
+def test_classifier(ml_model, testing_method='Augmented'):
+    trained_model_filename = find_model_filename('Classification',
                                                  ml_model)
     test_dataset_filename = find_dataset_filename('Test',
                                                   testing_method)
@@ -65,8 +65,8 @@ def test_classifier(ml_model, testing_method='augmented'):
     return compute_metrics(chosen_indices, y_test, all_timings)
 
 
-def timings_in_test(model, testing_method='augmented', training_method=None):
-    test_dataset_filename = find_dataset_filename('test',
+def timings_in_test(model, testing_method='Augmented', training_method=None):
+    test_dataset_filename = find_dataset_filename('Test',
                                                   testing_method)
     with open(test_dataset_filename, 'rb') as test_dataset_file:
         x_test, _, all_timings = pickle.load(test_dataset_file)
@@ -85,10 +85,10 @@ def timings_in_test(model, testing_method='augmented', training_method=None):
 
 
 def test_regressor(ml_model):
-    trained_model_filename = find_model_filename('regression',
+    trained_model_filename = find_model_filename('Regression',
                                                  ml_model)
-    test_dataset_filename = find_dataset_filename('test',
-                                                  'regression')
+    test_dataset_filename = find_dataset_filename('Test',
+                                                  'Regression')
     with open(trained_model_filename, 'rb') as trained_model_file:
         model = pickle.load(trained_model_file)
     with open(test_dataset_filename, 'rb') as test_dataset_file:
@@ -98,7 +98,7 @@ def test_regressor(ml_model):
     print(f"{ml_model} gave {avg_error}")
 
 
-def test_model(ml_model, paradigm, testing_method='augmented'):
+def test_model(ml_model, paradigm, testing_method='Augmented'):
     test_dataset_filename = find_dataset_filename('Test',
                                                   testing_method)
     with open(test_dataset_filename, 'rb') as test_dataset_file:
@@ -115,21 +115,22 @@ def test_model(ml_model, paradigm, testing_method='augmented'):
                            ml_model)
 
 
-def choose_indices(ml_model, dataset, paradigm=''):
-    trained_model_filename = find_model_filename(paradigm, ml_model)
-    with open(trained_model_filename, 'rb') as trained_model_file:
-        model = pickle.load(trained_model_file)
-    if ml_model in regressors:
-        chosen_indices = [return_regressor_choice(model, features)
-                          for features in dataset['features']]
-    elif ml_model in classifiers:
-        chosen_indices = [model.predict([features])[0]
-                          for features in dataset['features']]
-    elif paradigm == 'reinforcement':
-        chosen_indices = [ordering_choice_reinforcement(model, projections)
-                          for projections in dataset['projections']]
-    elif ml_model in heuristics:
-        ordering_choices_heuristics(model, dataset)
+def choose_indices(model_name, testing_dataset, paradigm='', training_quality='Augmented'):
+    if model_name in heuristics:
+        chosen_indices = ordering_choices_heuristics(model_name, testing_dataset, paradigm)
+    else:
+        trained_model_filename = find_model_filename(model_name, paradigm, training_quality)
+        with open(trained_model_filename, 'rb') as trained_model_file:
+            model = pickle.load(trained_model_file)
+        if model_name in regressors:
+            chosen_indices = [return_regressor_choice(model, features)
+                              for features in testing_dataset['features']]
+        elif model_name in classifiers:
+            chosen_indices = [model.predict([features])[0]
+                              for features in testing_dataset['features']]
+        elif paradigm == 'Reinforcement':
+            chosen_indices = [ordering_choice_reinforcement(model, projections)
+                              for projections in testing_dataset['projections']]
     return chosen_indices
 
 

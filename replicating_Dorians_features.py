@@ -69,13 +69,14 @@ def extract_features(dataset):
         names, instance_features = \
             features_from_set_of_polys(original_polynomials)
         all_features.append(instance_features)
-    my_dataset['polynomials'] = np.array(all_original_polynomials)
+    my_dataset['polynomials'] = all_original_polynomials
     my_dataset['names'] = np.array(names)
     my_dataset['features'] = np.array(all_features)
     my_dataset['labels'] = np.array(all_labels)
     my_dataset['timings'] = np.array(all_timings)
-    my_dataset['projections'] = np.array(all_projections)
+    my_dataset['projections'] = all_projections
     my_dataset['cells'] = np.array(all_cells)
+    # all these use to be converted to np.array()
     return my_dataset
 
 

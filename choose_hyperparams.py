@@ -28,16 +28,16 @@ def k_folds_ml(x_train, y_train, model, random_state=0):
     return rf_cv.best_params_
 
 
-def choose_hyperparams(ml_model, method):
+def choose_hyperparams(model_name, paradigm, training_quality):
     """Given a ml_model and a method, a file with the hyperparameters
     chosen by cross validation is created"""
-    this_dataset_file = find_dataset_filename('Train', method=method)
+    this_dataset_file = find_dataset_filename('Train', dataset_quality=training_quality)
     with open(this_dataset_file, 'rb') as f:
         dataset = pickle.load(f)
-    hyperparams = k_folds_ml(dataset['features'], dataset['labels'], model=ml_model)
+    hyperparams = k_folds_ml(dataset['features'], dataset['labels'], model=model_name)
     print(hyperparams)
-    hyperparams_filename = find_hyperparams_filename(method, ml_model)
-    print(hyperparams_filename)
+    hyperparams_filename = find_hyperparams_filename(model_name, paradigm, training_quality)
+    print('new hyperparams_filename', hyperparams_filename)
     write_yaml_to_file(hyperparams, hyperparams_filename)
 
 

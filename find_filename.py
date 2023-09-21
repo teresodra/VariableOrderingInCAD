@@ -15,7 +15,7 @@ def find_model_filename(model_name, paradigm, training_quality):
                         f'{model_name}-{paradigm}-{training_quality}.txt')
 
 
-def find_dataset_filename(purpose, method=None):
+def find_dataset_filename(purpose, dataset_quality=None, paradigm=''):
     if purpose == "unclean":
         return os.path.join(os.path.dirname(__file__),
                             'DatasetsBeforeProcessing',
@@ -34,7 +34,7 @@ def find_dataset_filename(purpose, method=None):
     elif purpose in purposes:
         return os.path.join(os.path.dirname(__file__),
                             'datasets', f'{purpose}',
-                            f'{method}_{purpose}_dataset.txt')
+                            f'{dataset_quality}-{purpose}-{paradigm}-dataset.txt')
     else:
         raise Exception(f"Purpose {purpose} not found")
 

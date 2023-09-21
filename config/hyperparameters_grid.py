@@ -2,9 +2,9 @@
 
 grid = dict()
 grid['RF-Classifier'] = {
-    'n_estimators': [200, 300, 400, 500],
+    'n_estimators': [200, 500],
     'max_features': ['sqrt', 'log2'],
-    'max_depth': [4, 5, 6, 7, 8],
+    'max_depth': [4, 6, 8],
     'criterion': ['gini', 'entropy']
 }
 grid['KNN-Classifier'] = {
@@ -15,8 +15,7 @@ grid['KNN-Classifier'] = {
     # 'p': range(1, 4, 1)
 }
 grid['MLP-Classifier'] = {
-    'hidden_layer_sizes': [(5, 5), (15, 15), (20, 20),
-                           (10, 10, 10), (20, 20, 20)],
+    'hidden_layer_sizes': [(30, 30), (10, 10, 10), (20, 20, 20)],
     'activation': ['tanh', 'relu'],
     'solver': ['sgd', 'adam'],
     'learning_rate': ['constant', 'adaptive'],
@@ -43,9 +42,13 @@ grid['GB-Classifier'] = {
 }
 
 grid['RF-Regressor'] = {
-    'criterion': ['squared_error', 'friedman_mse'],
-    "max_depth": [1, 3, 7],
-    "min_samples_leaf": [1, 5, 10],
+    'n_estimators': [200, 500],
+    'max_features': ['sqrt', 'log2'],
+    'max_depth': [4, 6, 8],
+    'criterion': ['friedman_mse', 'squared_error']
+    # 'criterion': ['squared_error', 'friedman_mse'],
+    # "max_depth": [1, 3, 7],
+    # "min_samples_leaf": [1, 5, 10],
 }
 grid['KNN-Regressor'] = {
     'n_neighbors': [3, 5, 10],
@@ -53,10 +56,16 @@ grid['KNN-Regressor'] = {
     'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute']
 }
 grid['MLP-Regressor'] = {
-    'hidden_layer_sizes': [(100,), (20, 20), (10, 10, 10)],
-    'activation': ['logistic', 'tanh', 'relu'],
-    'solver': ['adam', 'sgd'],
-    'alpha': [0.0001, 0.001, 0.01]
+    'hidden_layer_sizes': [(30, 30), (10, 10, 10), (20, 20, 20)],
+    'activation': ['tanh', 'relu'],
+    'solver': ['sgd', 'adam'],
+    'learning_rate': ['constant', 'adaptive'],
+    'alpha': [0.05, 0.005],
+    'max_iter': [1000]
+    # 'hidden_layer_sizes': [(30, 30), (20, 20, 20), (10, 10, 10)],
+    # 'activation': ['logistic', 'tanh', 'relu'],
+    # 'solver': ['adam', 'sgd'],
+    # 'alpha': [0.0001, 0.001, 0.01]
 }
 grid['DT-Regressor'] = {
     "splitter": ["best", "random"],

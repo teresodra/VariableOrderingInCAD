@@ -83,7 +83,6 @@ def cleaning_dataset():
 
 def convert_to_timing(timing_str, penalization=2):
     if not contains_float(timing_str):
-        print(penalization * float(timing_str[5:]))
         return penalization * float(timing_str[5:])
     return float(timing_str)
 
@@ -109,4 +108,4 @@ def contains_int(input_str):
     match = re.match(int_pattern, input_str)
     return match is not None
 
-cleaning_dataset()
+# cleaning_dataset()

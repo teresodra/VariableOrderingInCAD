@@ -40,16 +40,16 @@ def create_train_test_datasets():
     # train and test sets are created
     random_state = 0
     print(dataset.keys())
-    datasets['Train_Normal']['features'], \
-        datasets['Test_Normal']['features'], \
-        datasets['Train_Normal']['labels'], \
-        datasets['Test_Normal']['labels'], \
-        datasets['Train_Normal']['timings'], \
-        datasets['Test_Normal']['timings'], \
-        datasets['Train_Normal']['projections'], \
-        datasets['Test_Normal']['projections'], \
-        datasets['Train_Normal']['cells'], \
-        datasets['Test_Normal']['cells'] = \
+    datasets['Train_Biased']['features'], \
+        datasets['Test_Biased']['features'], \
+        datasets['Train_Biased']['labels'], \
+        datasets['Test_Biased']['labels'], \
+        datasets['Train_Biased']['timings'], \
+        datasets['Test_Biased']['timings'], \
+        datasets['Train_Biased']['projections'], \
+        datasets['Test_Biased']['projections'], \
+        datasets['Train_Biased']['cells'], \
+        datasets['Test_Biased']['cells'] = \
         train_test_split(dataset['features'],
                          dataset['labels'],
                          dataset['timings'],
@@ -62,7 +62,7 @@ def create_train_test_datasets():
         datasets[f'{purpose}_Balanced'] = \
             {key: elem for key,
              elem in zip(keys, balance_dataset(
-                                   *[datasets[f'{purpose}_Normal'][key2]
+                                   *[datasets[f'{purpose}_Biased'][key2]
                                      for key2 in keys], nvar=3)) ##CHOOSE NVAR WELL
              }
         datasets[f'{purpose}_Balanced']['labels'] = \
@@ -70,7 +70,7 @@ def create_train_test_datasets():
         datasets[f'{purpose}_Augmented'] = \
             {key: elem for key,
              elem in zip(keys, augmentate_dataset(
-                                   *[datasets[f'{purpose}_Normal'][key2]
+                                   *[datasets[f'{purpose}_Biased'][key2]
                                      for key2 in keys], nvar=3))
              }
         print(f"features in {purpose}_Augmented", len(datasets[f'{purpose}_Augmented']['features'][0]))
@@ -79,7 +79,7 @@ def create_train_test_datasets():
     for purpose in purposes:
         for quality in dataset_qualities:
             this_dataset_filename = \
-                find_dataset_filename(purpose, method=quality)
+                find_dataset_filename(purpose, dataset_quality=quality)
             with open(this_dataset_filename, 'wb') as this_dataset_file:
                 pickle.dump(datasets[purpose + '_' + quality],
                             this_dataset_file)
@@ -109,12 +109,14 @@ def create_train_test_datasets():
 #                                 + [str(len(y[f'{purpose}_{method}']))])
 
 
-def create_regression_datasets(taking_logarithms=True):
+def create_regression_datasets(dataset_quality='Augmented',
+                               taking_logarithms=True):
     for purpose in purposes:
-        this_dataset_filename = find_dataset_filename(purpose,
-                                                      method='augmented')
+        existing_dataset_filename = find_dataset_filename(
+                                        purpose,
+                                        dataset_quality=dataset_quality)
         # we will use the augmented dataset here
-        with open(this_dataset_filename, 'rb') as this_dataset_file:
+        with open(existing_dataset_filename, 'rb') as this_dataset_file:
             regression_dataset = pickle.load(this_dataset_file)
             regression_dataset['labels'] = \
                 [timings[0] for timings
@@ -123,9 +125,11 @@ def create_regression_datasets(taking_logarithms=True):
                 regression_dataset['labels'] = \
                     [log(label) for label
                      in regression_dataset['labels']]
-            this_dataset_filename =\
-                find_dataset_filename(purpose, method='regression')
-            with open(this_dataset_filename, 'wb') as this_dataset_file:
+            new_dataset_filename = find_dataset_filename(
+                                       purpose,
+                                       dataset_quality=dataset_quality,
+                                       paradigm='Regression')
+            with open(new_dataset_filename, 'wb') as this_dataset_file:
                 pickle.dump(regression_dataset, this_dataset_file)
             # classification_dataset = regression_dataset
             # classification_dataset['labels'] = \

@@ -35,4 +35,4 @@ regressors = {
 
 all_models = {**classifiers, **regressors}
 
-heuristics = []#'T1', 'gmods', 'brown', 'random', 'virtual-best']
+heuristics = ['T1', 'gmods', 'brown', 'random', 'virtual-best']

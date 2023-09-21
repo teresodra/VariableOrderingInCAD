@@ -15,29 +15,30 @@ from replicating_Dorians_features import compute_features_for_var
 from test_models import compute_metrics
 
 
-def train_model(ml_model, method):
-    train_data_filename = find_dataset_filename('Train', method=method)
-    hyperparams_file = find_hyperparams_filename(method, ml_model)
+def train_model(model_name, paradigm, training_quality):
+    train_data_filename = find_dataset_filename('Train', dataset_quality=training_quality, paradigm=paradigm)
+    print(model_name, 'dataset used for train', train_data_filename)
+    hyperparams_file = find_hyperparams_filename(model_name, paradigm=paradigm, training_quality=training_quality)
     with open(train_data_filename, 'rb') as train_data_file:
         train_dataset = pickle.load(train_data_file)
     hyperparams = read_yaml_from_file(hyperparams_file)
-    current_model = all_models[ml_model]
+    current_model = all_models[model_name]
     model = current_model(**hyperparams)
     # model = current_model()
     print('here')
     model.fit(train_dataset['features'], train_dataset['labels'])
-    trained_model_filename = find_model_filename(method, ml_model)
+    trained_model_filename = find_model_filename(model_name, paradigm, training_quality)
     print('here2')
     with open(trained_model_filename, 'wb') as trained_model_file:
         pickle.dump(model, trained_model_file)
     return model
 
 
-def train_regression_model(ml_model, method):
+def train_regression_model(model_name, method):
     train_data_filename = find_dataset_filename('Train', method=method)
     with open(train_data_filename, 'rb') as train_data_file:
         train_dataset = pickle.load(train_data_file)
-    # hyperparams_file = find_hyperparams_filename(method, ml_model)
+    # hyperparams_file = find_hyperparams_filename(method, model_name)
     # hyperparams = read_yaml_from_file(hyperparams_file)
     train_dataset['features'] = np.asarray([x_t for x_t, t_t in zip(train_dataset['features'], train_dataset['timings'])
                                             if t_t[:4] != 'Over'], dtype=float)
@@ -46,10 +47,10 @@ def train_regression_model(ml_model, method):
                           ####
                           # IS THIS REALLY DOING SOMTHING?
                           # What if we used twice timelimit instead
-    current_model = ml_regressors[ml_model]
+    current_model = ml_regressors[model_name]
     reg = current_model()  # **hyperparams)
     reg.fit(train_dataset['features'], train_dataset['timings'])
-    # trained_model_filename = find_model_filename(method, ml_model, 'regression')
+    # trained_model_filename = find_model_filename(method, model_name, 'regression')
     # with open(trained_model_filename, 'wb') as trained_model_file:
     #     pickle.dump(reg, trained_model_file)
     return reg
@@ -71,13 +72,13 @@ def test_regression_model(method, regressor):
     y_pred = [choose_using_regression(x_i, regressor) for x_i in x_test]
 
 
-def train_reinforcement_model(ml_model, method='Normal'):
+def train_reinforcement_model(model_name, method='Normal'):
     train_data_filename = find_dataset_filename('Train', method=method)
     with open(train_data_filename, 'rb') as train_data_file:
         train_dataset = pickle.load(train_data_file)
-    # hyperparams_file = find_hyperparams_filename(method, ml_model)
+    # hyperparams_file = find_hyperparams_filename(method, model_name)
     # hyperparams = read_yaml_from_file(hyperparams_file)
-    current_model = all_models[ml_model]
+    current_model = all_models[model_name]
     # model = current_model(**hyperparams)
     model = current_model()
     first_polys = train_dataset['projections'][0][0][0]
@@ -94,7 +95,7 @@ def train_reinforcement_model(ml_model, method='Normal'):
             training_labels += new_training_labels
         model.fit(training_features, training_labels)
         print(test_reinforcement_model(model))
-    trained_model_filename = find_model_filename('reinforcement', ml_model)
+    trained_model_filename = find_model_filename('reinforcement', model_name)
     with open(trained_model_filename, 'wb') as trained_model_file:
         pickle.dump(model, trained_model_file)
 
@@ -167,14 +168,14 @@ def ordering_choice_reinforcement(model, projections):
     return ordering
 
 
-def test_reinforcement_model(ml_model, method='Normal', nvar=3):
+def test_reinforcement_model(model_name, method='Normal', nvar=3):
     train_data_filename = find_dataset_filename('Test', method=method)
     with open(train_data_filename, 'rb') as train_data_file:
         testing_dataset = pickle.load(train_data_file)
-    # trained_model_filename = find_model_filename('reinforcement', ml_model)
+    # trained_model_filename = find_model_filename('reinforcement', model_name)
     # with open(trained_model_filename, 'rb') as trained_model_file:
     #     model = pickle.load(trained_model_file)
-    model = ml_model
+    model = model_name
     chosen_indices = [ordering_choice_reinforcement(model, projections)
                       for projections in testing_dataset['projections']]
     metrics = compute_metrics(chosen_indices,
