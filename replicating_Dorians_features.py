@@ -57,15 +57,17 @@ def extract_features(dataset):
     all_original_polynomials = []
     all_projections = []
     all_cells = []
-    for index, projections in enumerate(dataset[0]):
+    all_subdirs = []
+    for index, projections in enumerate(dataset['projections']):
         all_projections.append(projections)
         original_polynomials = projections[0][0]
         # the original polynomials are the initial polynomials of any
         # of the possible projections (also of the first one)
         all_original_polynomials.append(original_polynomials)
-        all_labels.append(dataset[1][index])
-        all_timings.append(dataset[2][index])
-        all_cells.append(dataset[4][index])
+        all_labels.append(dataset['targets'][index])
+        all_timings.append(dataset['timings'][index])
+        all_cells.append(dataset['ncells'][index])
+        all_subdirs.append(dataset['subdirs'][index])
         names, instance_features = \
             features_from_set_of_polys(original_polynomials)
         all_features.append(instance_features)
@@ -76,7 +78,10 @@ def extract_features(dataset):
     my_dataset['timings'] = np.array(all_timings)
     my_dataset['projections'] = all_projections
     my_dataset['cells'] = np.array(all_cells)
+    my_dataset['subdir'] = np.array(all_subdirs)
     # all these use to be converted to np.array()
+    # Modify this so that smaller changes are done to my_dataset,
+    # because it is almost the same as dataset
     return my_dataset
 
 

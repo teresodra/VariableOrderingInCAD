@@ -15,30 +15,31 @@ from choose_hyperparams import choose_hyperparams
 from train_models import train_model
 from main_heuristics import ordering_choices_heuristics
 from find_filename import find_dataset_filename
-from find_filename import find_timings_lists
+# from find_filename import find_timings_lists
 from find_filename import find_hyperparams_filename
+from find_filename import find_all_info
 from test_models import compute_metrics
 from test_models import choose_indices
 
 
-def metrics_for_all_reps(all_indices_chosen, testing_dataset, ml_model):
-    all_metrics = [compute_metrics(chosen_indices, testing_dataset)
-                   for chosen_indices in all_indices_chosen]
-    aveg_metrics = {key: sum(metrics[key]/len(all_metrics)
-                             for metrics in all_metrics)
-                    for key in all_metrics[0]}
-    all_timings = testing_dataset['timings']
-    aveg_timings = []
-    for instance in range(len(all_indices_chosen[0])):
-        instance_timings = [timings[indices_chosen[instance]]
-                            for timings, indices_chosen
-                            in zip(all_timings, all_indices_chosen)]
-        aveg_timings.append(instance_timings)
-    timings_lists_filename = find_timings_lists(ml_model)
-    with open(timings_lists_filename, 'wb') as timings_lists_file:
-        pickle.dump(aveg_timings, timings_lists_file)
-    all_total_times = [metrics['TotalTime'] for metrics in all_metrics]
-    return aveg_metrics, all_total_times
+# def metrics_for_all_reps(all_indices_chosen, testing_dataset, ml_model):
+#     all_metrics = [compute_metrics(chosen_indices, testing_dataset)
+#                    for chosen_indices in all_indices_chosen]
+#     aveg_metrics = {key: sum(metrics[key]/len(all_metrics)
+#                              for metrics in all_metrics)
+#                     for key in all_metrics[0]}
+#     all_timings = testing_dataset['timings']
+#     aveg_timings = []
+#     for instance in range(len(all_indices_chosen[0])):
+#         instance_timings = [timings[indices_chosen[instance]]
+#                             for timings, indices_chosen
+#                             in zip(all_timings, all_indices_chosen)]
+#         aveg_timings.append(instance_timings)
+#     timings_lists_filename = find_timings_lists(ml_model)
+#     with open(timings_lists_filename, 'wb') as timings_lists_file:
+#         pickle.dump(aveg_timings, timings_lists_file)
+#     all_total_times = [metrics['TotalTime'] for metrics in all_metrics]
+#     return aveg_metrics, all_total_times
 
 
 def dominiks_plots(all_total_times):
@@ -84,10 +85,10 @@ def study_a_model(model_name: str,
     testing_filename = find_dataset_filename('Test', testing_quality)
     with open(testing_filename, 'rb') as testing_file:
         testing_dataset = pickle.load(testing_file)
-    factorial_nvar = len(testing_dataset['projections'][0])
-    if testing_quality in ['Biased', 'Balanced']:
+    if testing_quality == 'Biased':
         # If the dataset contains less factorial_nvar less instances,
         # we repeat each instance factorial_nvar times
+        factorial_nvar = len(testing_dataset['projections'][0])
         testing_dataset = \
             repeat_instances_dataset(testing_dataset, factorial_nvar)
     all_metrics = []
@@ -126,14 +127,17 @@ def study_a_model(model_name: str,
         model_info['All' + key] = [metrics[key]
                                    for metrics in all_metrics]
     # info of all metrics saved for seaborn boxplots
+    all_info_filename = find_all_info(model_name, paradigm, training_quality)
+    with open(all_info_filename, 'wb') as all_info_file:
+        pickle.dump(model_info, all_info_file)
     return model_info
 
 
 if __name__ == "__main__":
-    reps = 50
+    reps = 1
     data = dict()
     data['TotalTime'] = []
-    new_datasets = False
+    new_datasets = True
     if new_datasets:
         cleaning_dataset()
         create_train_test_datasets()
@@ -153,7 +157,7 @@ if __name__ == "__main__":
                 paradigm = ''
             elif model_name in regressors:
                 paradigm = 'Regression'
-
+        print(model_name)
         model_info = study_a_model(model_name=model_name,
                                    testing_quality=testing_quality,
                                    paradigm=paradigm,

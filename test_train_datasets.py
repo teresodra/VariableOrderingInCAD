@@ -17,6 +17,7 @@ from sklearn.model_selection import train_test_split
 from find_filename import find_dataset_filename
 from find_filename import find_other_filename
 from math import log
+from sklearn.model_selection import GroupShuffleSplit 
 
 
 def count_instances(my_dataset, instance):
@@ -40,23 +41,32 @@ def create_train_test_datasets():
     # train and test sets are created
     random_state = 0
     print(dataset.keys())
-    datasets['Train_Biased']['features'], \
-        datasets['Test_Biased']['features'], \
-        datasets['Train_Biased']['labels'], \
-        datasets['Test_Biased']['labels'], \
-        datasets['Train_Biased']['timings'], \
-        datasets['Test_Biased']['timings'], \
-        datasets['Train_Biased']['projections'], \
-        datasets['Test_Biased']['projections'], \
-        datasets['Train_Biased']['cells'], \
-        datasets['Test_Biased']['cells'] = \
-        train_test_split(dataset['features'],
-                         dataset['labels'],
-                         dataset['timings'],
-                         dataset['projections'],
-                         dataset['cells'],
-                         test_size=0.20,
-                         random_state=random_state)
+    train_inds, test_inds = my_train_test_split(dataset['subdir'])
+    for key in dataset:
+        if key != 'names':
+            datasets['Train_Biased'][key] = \
+                [dataset[key][i] for i in train_inds]
+            datasets['Test_Biased'][key] = \
+                [dataset[key][i] for i in test_inds]
+
+    # datasets['Train_Biased']['features'], \
+    #     datasets['Test_Biased']['features'], \
+    #     datasets['Train_Biased']['labels'], \
+    #     datasets['Test_Biased']['labels'], \
+    #     datasets['Train_Biased']['timings'], \
+    #     datasets['Test_Biased']['timings'], \
+    #     datasets['Train_Biased']['projections'], \
+    #     datasets['Test_Biased']['projections'], \
+    #     datasets['Train_Biased']['cells'], \
+    #     datasets['Test_Biased']['cells'] = \
+        # train_test_split(
+        #                  dataset['features'],
+        #                  dataset['labels'],
+        #                  dataset['timings'],
+        #                  dataset['projections'],
+        #                  dataset['cells'],
+        #                  test_size=0.20,
+        #                  random_state=random_state)
     keys = ['features', 'timings', 'cells']
     for purpose in purposes:
         datasets[f'{purpose}_Balanced'] = \
@@ -84,9 +94,8 @@ def create_train_test_datasets():
                 pickle.dump(datasets[purpose + '_' + quality],
                             this_dataset_file)
 
-
-    ## The following code is to count how many instances of each are there in the different datasets
-    ## Sould be substitute by another function
+    # The following code is to count how many instances of each are there in the different datasets
+    # Sould be substitute by another function
 
         # {datasets[f'{purpose}_balanced'][key]: elem for elem in balance_dataset(datasets[f'{purpose}_balanced'][key2] for key2 in keys) for key in keys}
         # x[f'{purpose}_augmented'], y[f'{purpose}_augmented'], t[f'{purpose}_augmented'] = augmentate_dataset(x[f'{purpose}_normal'], y[f'{purpose}_normal'], t[f'{purpose}_normal'])
@@ -135,6 +144,13 @@ def create_regression_datasets(dataset_quality='Augmented',
             # classification_dataset['labels'] = \
             #     [np.argmin(timings) for timings
             #      in regression_dataset['timings']]
+
+
+def my_train_test_split(groups):
+    splitter = GroupShuffleSplit(test_size=.20, n_splits=2, random_state=7)
+    split = splitter.split(groups, groups=groups)
+    train_inds, test_inds = next(split)
+    return train_inds, test_inds
 
 
 # create_regression_datasets(taking_logarithms=False)

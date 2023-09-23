@@ -19,7 +19,7 @@ def find_dataset_filename(purpose, dataset_quality=None, paradigm=''):
     if purpose == "unclean":
         return os.path.join(os.path.dirname(__file__),
                             'DatasetsBeforeProcessing',
-                            'dataset_without_repetition_return_ncells.txt')
+                            'dataset_without_repetition_return_ncells_with_subdir.txt')
     # 'dataset_with_repetition_return_ncells.txt')
     # for returning "repeated" instances
     # those with the same number of cells for all projections
@@ -49,6 +49,6 @@ def find_other_filename(search):
                         f'{search}.txt')
 
 
-def find_timings_lists(model):
+def find_all_info(model_name, paradigm, training_quality):
     return os.path.join(os.path.dirname(__file__), 'results',
-                        'timings_lists', f'{model}.txt')
+                        'all_info', f'{model_name}-{paradigm}-{training_quality}.txt')

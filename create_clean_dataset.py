@@ -53,7 +53,7 @@ def cleaning_dataset():
     clean_dataset['names'], clean_dataset['features'] = \
         remove_notunique_features(my_dataset['names'],
                                   my_dataset['features'])
-    print("features in normal", len(my_dataset['features'][0]))
+    print("features in biased", len(my_dataset['features'][0]))
     unique_features_filename = find_other_filename("unique_features")
     with open(unique_features_filename, 'wb') as unique_features_file:
         pickle.dump(clean_dataset['names'], unique_features_file)

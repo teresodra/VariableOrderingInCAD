@@ -17,7 +17,6 @@ from test_models import compute_metrics
 
 def train_model(model_name, paradigm, training_quality):
     train_data_filename = find_dataset_filename('Train', dataset_quality=training_quality, paradigm=paradigm)
-    print(model_name, 'dataset used for train', train_data_filename)
     hyperparams_file = find_hyperparams_filename(model_name, paradigm=paradigm, training_quality=training_quality)
     with open(train_data_filename, 'rb') as train_data_file:
         train_dataset = pickle.load(train_data_file)
