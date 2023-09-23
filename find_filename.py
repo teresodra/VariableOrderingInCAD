@@ -5,7 +5,7 @@ from config.general_values import purposes
 
 def find_hyperparams_filename(model_name, paradigm, training_quality):
     return os.path.join(os.path.dirname(__file__),
-                        'config', 'hyperparams',
+                        'config', 'hyperparameters',
                         f'{model_name}-{paradigm}-{training_quality}')
 
 
@@ -18,7 +18,7 @@ def find_model_filename(model_name, paradigm, training_quality):
 def find_dataset_filename(purpose, dataset_quality=None, paradigm=''):
     if purpose == "unclean":
         return os.path.join(os.path.dirname(__file__),
-                            'DatasetsBeforeProcessing',
+                            'datasets', 'before_processing',
                             'dataset_without_repetition_return_ncells_with_subdir.txt')
     # 'dataset_with_repetition_return_ncells.txt')
     # for returning "repeated" instances
@@ -51,4 +51,4 @@ def find_other_filename(search):
 
 def find_all_info(model_name, paradigm, training_quality):
     return os.path.join(os.path.dirname(__file__), 'results',
-                        'all_info', f'{model_name}-{paradigm}-{training_quality}.txt')
+                        f'{model_name}-{paradigm}-{training_quality}.txt')

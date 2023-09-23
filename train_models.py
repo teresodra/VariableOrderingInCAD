@@ -15,6 +15,7 @@ from find_filename import find_model_filename
 
 
 def train_model(model_name, paradigm, training_quality):
+    print(f"Training {model_name}")
     train_data_filename = find_dataset_filename('Train', dataset_quality=training_quality, paradigm=paradigm)
     hyperparams_file = find_hyperparams_filename(model_name, paradigm=paradigm, training_quality=training_quality)
     with open(train_data_filename, 'rb') as train_data_file:
@@ -23,10 +24,8 @@ def train_model(model_name, paradigm, training_quality):
     current_model = all_models[model_name]
     model = current_model(**hyperparams)
     # model = current_model()
-    print('here')
     model.fit(train_dataset['features'], train_dataset['labels'])
     trained_model_filename = find_model_filename(model_name, paradigm, training_quality)
-    print('here2')
     with open(trained_model_filename, 'wb') as trained_model_file:
         pickle.dump(model, trained_model_file)
     return model
