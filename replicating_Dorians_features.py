@@ -1,11 +1,7 @@
-"""
-IS THIS BEING USED?
-YES, IT IS!
-"""
-
 import itertools
 # from xml.sax.handler import all_features
 import numpy as np
+
 from config.general_values import operations
 
 

@@ -1,16 +1,11 @@
-import csv
 import math
 import pickle
 import importlib.util
-import numpy as np
-from sklearn import metrics
-from config.general_values import dataset_qualities
-from config.ml_models import all_models
+
+
 from config.ml_models import regressors
 from config.ml_models import classifiers
 from config.ml_models import heuristics
-from find_filename import find_output_filename
-from find_filename import find_dataset_filename
 from find_filename import find_model_filename
 from main_heuristics import ordering_choices_heuristics
 # from train_models import ordering_choice_reinforcement
@@ -22,97 +17,21 @@ else:
     from packages.dataset_manipulation.dataset_manipulation import augmentate_instance
 
 
-# def test_model(trained_model_filename, test_dataset_filename):
+# def test_model(ml_model, paradigm, testing_method='Augmented'):
+#     test_dataset_filename = find_dataset_filename('Test',
+#                                                   testing_method)
+#     with open(test_dataset_filename, 'rb') as test_dataset_file:
+#         testing_dataset = pickle.load(test_dataset_file)
+#     trained_model_filename = find_model_filename(paradigm,
+#                                                  ml_model)
 #     with open(trained_model_filename, 'rb') as trained_model_file:
 #         model = pickle.load(trained_model_file)
-#     with open(test_dataset_filename, 'rb') as test_dataset_file:
-#         x_test, y_test, _ = pickle.load(test_dataset_file)
-#     y_pred = model.predict(x_test)
-#     return metrics.accuracy_score(y_test, y_pred)
-
-
-def test_results(training_method):
-    output_filename = find_output_filename(training_method)
-    with open(output_filename, 'w') as output_file:
-        writer_balanced = csv.writer(output_file)
-        writer_balanced.writerow(["Name"] + dataset_qualities)
-        for ml_model in all_models:
-            trained_model_filename = find_model_filename(training_method,
-                                                         ml_model)
-            accuracy = dict()
-            for testing_method in dataset_qualities:
-                test_dataset_filename = find_dataset_filename('Test',
-                                                              testing_method)
-                accuracy[testing_method] = test_model(trained_model_filename,
-                                                      test_dataset_filename)
-            round_accuracies = [round(acc, 2)
-                                for acc in [accuracy[method]
-                                for method in dataset_qualities]]
-            writer_balanced.writerow([ml_model + "-" + training_method] +
-                                     round_accuracies)
-
-
-def test_classifier(ml_model, testing_method='Augmented'):
-    trained_model_filename = find_model_filename('Classification',
-                                                 ml_model)
-    test_dataset_filename = find_dataset_filename('Test',
-                                                  testing_method)
-    with open(trained_model_filename, 'rb') as trained_model_file:
-        model = pickle.load(trained_model_file)
-    with open(test_dataset_filename, 'rb') as test_dataset_file:
-        x_test, y_test, all_timings = pickle.load(test_dataset_file)
-    chosen_indices = [return_regressor_choice(model, features) for features in x_test]
-    return compute_metrics(chosen_indices, y_test, all_timings)
-
-
-def timings_in_test(model, testing_method='Augmented', training_method=None):
-    test_dataset_filename = find_dataset_filename('Test',
-                                                  testing_method)
-    with open(test_dataset_filename, 'rb') as test_dataset_file:
-        x_test, _, all_timings = pickle.load(test_dataset_file)
-    if model == 'optimal':
-        t_pred = [min(timings) for timings in all_timings]
-    else:
-        trained_model_filename = find_model_filename(training_method,
-                                                     model)
-        with open(trained_model_filename, 'rb') as trained_model_file:
-            model = pickle.load(trained_model_file)
-        y_pred = model.predict(x_test)
-        # This doesn't work because agumenteed and balanced
-        # only return one timing, not 6
-        t_pred = [timings[y] for timings, y in zip(all_timings, y_pred)]
-    return t_pred
-
-
-def test_regressor(ml_model):
-    trained_model_filename = find_model_filename('Regression',
-                                                 ml_model)
-    test_dataset_filename = find_dataset_filename('Test',
-                                                  'Regression')
-    with open(trained_model_filename, 'rb') as trained_model_file:
-        model = pickle.load(trained_model_file)
-    with open(test_dataset_filename, 'rb') as test_dataset_file:
-        x_test, y_test, all_timings = pickle.load(test_dataset_file)
-    y_pred = model.predict(x_test)
-    avg_error = sum([abs(p-t) for p, t in zip(y_pred, y_test)])/len(y_pred)
-    print(f"{ml_model} gave {avg_error}")
-
-
-def test_model(ml_model, paradigm, testing_method='Augmented'):
-    test_dataset_filename = find_dataset_filename('Test',
-                                                  testing_method)
-    with open(test_dataset_filename, 'rb') as test_dataset_file:
-        testing_dataset = pickle.load(test_dataset_file)
-    trained_model_filename = find_model_filename(paradigm,
-                                                 ml_model)
-    with open(trained_model_filename, 'rb') as trained_model_file:
-        model = pickle.load(trained_model_file)
-    chosen_indices = choose_indices(model, testing_dataset)
-    return compute_metrics(chosen_indices,
-                           testing_dataset['labels'],
-                           testing_dataset['timings'],
-                           testing_dataset['cells'],
-                           ml_model)
+#     chosen_indices = choose_indices(model, testing_dataset)
+#     return compute_metrics(chosen_indices,
+#                            testing_dataset['labels'],
+#                            testing_dataset['timings'],
+#                            testing_dataset['cells'],
+#                            ml_model)
 
 
 def choose_indices(model_name, testing_dataset, paradigm='', training_quality='Augmented'):

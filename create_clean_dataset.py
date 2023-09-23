@@ -11,25 +11,24 @@ if isinstance(importlib.util.find_spec('dataset_manipulation'), type(None)):
     from dataset_manipulation import remove_notunique_features
 else:
     from packages.dataset_manipulation import remove_notunique_features
-from from_poly_set_to_features import poly_set_feature_extractor
 from find_filename import find_dataset_filename
 from find_filename import find_other_filename
 
 
-def create_dataframe(dataset):
-    all_features = []
-    all_labels = dataset[1][:]
-    all_timings = dataset[2][:]
-    all_original_polynomials = []
-    for index, all_projections in enumerate(dataset[0]):
-        original_polynomials = all_projections[0][0]
-        all_original_polynomials.append(original_polynomials)
-    names, all_features =\
-        poly_set_feature_extractor(all_original_polynomials,
-                                   determine_standarization=True,
-                                   determine_unique_features=True)
-    return np.array(all_original_polynomials), np.array(names),\
-        np.array(all_features), np.array(all_labels), np.array(all_timings)
+# def create_dataframe(dataset):
+#     all_features = []
+#     all_labels = dataset[1][:]
+#     all_timings = dataset[2][:]
+#     all_original_polynomials = []
+#     for index, all_projections in enumerate(dataset[0]):
+#         original_polynomials = all_projections[0][0]
+#         all_original_polynomials.append(original_polynomials)
+#     names, all_features =\
+#         poly_set_feature_extractor(all_original_polynomials,
+#                                    determine_standarization=True,
+#                                    determine_unique_features=True)
+#     return np.array(all_original_polynomials), np.array(names),\
+#         np.array(all_features), np.array(all_labels), np.array(all_timings)
 
 
 # dataset_filename = os.path.join(os.path.dirname(__file__),

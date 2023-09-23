@@ -2,8 +2,6 @@
 import numpy as np
 import math
 import random
-from .exploit_symmetries import give_all_symmetries
-from .exploit_symmetries import augmentate_timings
 from itertools import permutations
 # from sklearn.preprocessing import normalize
 
@@ -104,15 +102,6 @@ def name_unique_features(names, features):
             new_features.append(feature)
             new_names.append(names[index])
     return new_names
-
-
-def get_unique_feature_names(unique_names, names, features):
-    """Return the features corresponding to a name in 'unique_names'."""
-    unique_features = []
-    for index, feature in enumerate(zip(*features)):
-        if names[index] in unique_names:
-            unique_features.append(feature)
-    return np.transpose(unique_features)
 
 
 def remove_notunique_features(names, features, nvar=3):
